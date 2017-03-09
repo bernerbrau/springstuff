@@ -8,6 +8,7 @@
 package org.vumc;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Patient
@@ -16,6 +17,7 @@ public class Patient
   public String             mrn;
   public String             firstName;
   public String             lastName;
+  public boolean            hasHieData;
   public Map<String,Object> fields;
 
   public Patient() {}
@@ -28,6 +30,7 @@ public class Patient
                .add("mrn", mrn)
                .add("firstName", firstName)
                .add("lastName", lastName)
+               .add("hasHieData", hasHieData)
                .add("fields", fields)
                .toString();
   }
