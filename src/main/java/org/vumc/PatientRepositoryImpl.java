@@ -14,6 +14,7 @@ import org.mapdb.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import rx.Observable;
 import rx.Subscription;
 
@@ -27,56 +28,34 @@ import java.util.List;
 @Repository
 public class PatientRepositoryImpl implements PatientRepository
 {
-  private Serializer<Patient> serializer = new Serializer<Patient>()
-  {
-    ObjectMapper mapper = new ObjectMapper();
 
-    @Override
-    public void serialize(@NotNull final DataOutput2 out, @NotNull final Patient value)
-        throws IOException
-    {
-      mapper.writeValue((DataOutput) out, value);
-    }
-
-    @Override
-    public Patient deserialize(@NotNull final DataInput2 input, final int available)
-        throws IOException
-    {
-      return mapper.readValue(input, Patient.class);
-    }
-  };
-
-  private DB patientDB = DBMaker.fileDB("patients.db")
-                             .checksumHeaderBypass()
-                             .transactionEnable()
-                             .make();
-
-  private List<Patient> patients = patientDB
-          .indexTreeList("patients", serializer)
-          .createOrOpen();
-
+  private List<Patient>       patients;
   private Observable<Patient> patientObservable;
   private Subscription        subscription;
 
   @Autowired
   public PatientRepositoryImpl(
-      @Qualifier("patientObservable") Observable<Patient> inPatientObservable)
+      @Qualifier("patientObservable") Observable<Patient> inPatientObservable,
+      @Qualifier("patientPersistentList") List<Patient> inPatients)
   {
     patientObservable = inPatientObservable;
+    patients = inPatients;
   }
 
-  private synchronized void insertPatient(Patient inPatient)
+  @Transactional
+  private void insertPatient(Patient inPatient)
   {
     patients.add(inPatient);
-    patientDB.commit();
   }
 
+  @Transactional
   @Override
-  public synchronized List<? extends Patient> findAll()
+  public List<? extends Patient> findAll()
   {
     return new ArrayList<>(patients);
   }
 
+  @Transactional
   @Override
   public Patient find(final int inId)
   {
@@ -97,7 +76,6 @@ public class PatientRepositoryImpl implements PatientRepository
   void unsubscribe()
   {
     subscription.unsubscribe();
-    patientDB.close();
   }
 
 }

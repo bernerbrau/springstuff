@@ -38,7 +38,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web') {
         exclude module: 'spring-boot-starter-tomcat'
     }
-    compile('org.springframework.boot:spring-boot-starter-jetty')
+    compile('org.springframework.boot:spring-boot-starter-undertow')
 
     compile("com.google.guava:guava")
     compile('io.reactivex:rxjava:1.1.6')
