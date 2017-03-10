@@ -15,4 +15,6 @@ public interface PatientRepository
   List<? extends Patient> findAll();
 
   Patient find(int inId);
+
+  int getNextId();
 }

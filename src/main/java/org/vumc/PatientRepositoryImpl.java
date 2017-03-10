@@ -7,6 +7,10 @@
  */
 package org.vumc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Ordering;
+import org.jetbrains.annotations.NotNull;
+import org.mapdb.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -15,14 +19,41 @@ import rx.Subscription;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Repository
 public class PatientRepositoryImpl implements PatientRepository
 {
-  private List<Patient> patients = new LinkedList<>();
+  private Serializer<Patient> serializer = new Serializer<Patient>()
+  {
+    ObjectMapper mapper = new ObjectMapper();
+
+    @Override
+    public void serialize(@NotNull final DataOutput2 out, @NotNull final Patient value)
+        throws IOException
+    {
+      mapper.writeValue((DataOutput) out, value);
+    }
+
+    @Override
+    public Patient deserialize(@NotNull final DataInput2 input, final int available)
+        throws IOException
+    {
+      return mapper.readValue(input, Patient.class);
+    }
+  };
+
+  private DB patientDB = DBMaker.fileDB("patients.db")
+                             .checksumHeaderBypass()
+                             .transactionEnable()
+                             .make();
+
+  private List<Patient> patients = patientDB
+          .indexTreeList("patients", serializer)
+          .createOrOpen();
 
   private Observable<Patient> patientObservable;
   private Subscription        subscription;
@@ -34,8 +65,10 @@ public class PatientRepositoryImpl implements PatientRepository
     patientObservable = inPatientObservable;
   }
 
-  private synchronized void insertPatient(Patient inPatient) {
+  private synchronized void insertPatient(Patient inPatient)
+  {
     patients.add(inPatient);
+    patientDB.commit();
   }
 
   @Override
@@ -47,21 +80,24 @@ public class PatientRepositoryImpl implements PatientRepository
   @Override
   public Patient find(final int inId)
   {
-    return patients
-        .stream()
-        .filter(p -> p.id == inId)
-        .findFirst()
-        .orElse(null);
+    return patients.stream().filter(p -> p.id == inId).findFirst().orElse(null);
+  }
+
+  public int getNextId() {
+    return patients.stream().map(p -> p.id).max(Ordering.natural()).orElse(0) + 1;
   }
 
   @PostConstruct
-  void subscribeToPatientFeed() {
+  void subscribeToPatientFeed()
+  {
     subscription = patientObservable.subscribe(this::insertPatient);
   }
 
   @PreDestroy
-  void unsubscribe() {
+  void unsubscribe()
+  {
     subscription.unsubscribe();
+    patientDB.close();
   }
 
 }

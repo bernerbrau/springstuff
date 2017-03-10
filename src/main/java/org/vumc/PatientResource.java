@@ -19,13 +19,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequestMapping("/patients")
 public class PatientResource
 {
-  private final AtomicInteger sequence = new AtomicInteger(0);
+  private final AtomicInteger sequence;
   private final PatientRepository patientRepository;
   private final Observer<Patient> patientObserver;
 
   @Autowired
   public PatientResource(PatientRepository patientRepository,
                          Observer<Patient> patientObserver) {
+    this.sequence = new AtomicInteger(patientRepository.getNextId());
     this.patientRepository = patientRepository;
     this.patientObserver = patientObserver;
   }
