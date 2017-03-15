@@ -21,16 +21,54 @@ jar {
 	version = '0.0.1-SNAPSHOT'
 }
 
+// TODO find a plugin that does this!!
+import org.apache.tools.ant.taskdefs.condition.Os
+
+def webProjectDir = './build/_webProject'
+def webProjectOutputDir = './build/_webProject/dist'
+def webProjectSvnUrl = 'https://vcs.mc.vanderbilt.edu/health-it/continuum/web/trunk'
+
+task buildWebProject {
+	exec {
+		workingDir '.'
+		commandLine 'sh','getWebProject.sh',webProjectSvnUrl,webProjectDir
+    }
+	exec {
+		workingDir webProjectDir
+		commandLine 'npm','install'
+	}
+	exec {
+        workingDir webProjectDir
+		commandLine 'npm','run','build'
+    }
+}
+
+war {
+    // Download and build ContinuumWeb, removing "http://localhost:8080" from urls
+	dependsOn buildWebProject
+	from (webProjectOutputDir) {
+		filter{ line -> line
+                .replaceAll(/http:\/\/localhost:8080\//,'/continuum/')
+                .replaceAll('src="/',
+                            'src="/continuum/')
+                .replaceAll('href="/',
+                            'href="/continuum/')
+                .replaceAll(/\/(continuum\/){2,}/,
+                            '/continuum/')}
+	}
+}
+
+// Spring Boot IDEA plugin doesn't recognize "provided", exclude these jars manually instead
+war {
+    classpath = classpath.filter {f -> !f.name.toLowerCase().find(/undertow|tomcat|jetty/)}
+}
+
 sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
 }
 
-war {
-    // Hacky but allows Spring Boot IDEA config to run
-    classpath = classpath.filter {f -> !f.name.toLowerCase().find(/undertow|tomcat|jetty/)}
-}
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')

@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/patients")
+@RequestMapping("/api/patients")
 public class PatientResource
 {
   private final AtomicInteger sequence;
