@@ -5,14 +5,13 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc.mapdb;
+package org.vumc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.mapdb.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.vumc.Patient;
 
 import javax.annotation.PreDestroy;
 import java.io.DataOutput;
@@ -45,7 +44,7 @@ class JsonSerializer<T> implements Serializer<T>
 }
 
 @Configuration
-public class MapDBSource
+public class MapDBConfig
 {
 
   private DB db = DBMaker.fileDB("patients.db")
@@ -60,7 +59,7 @@ public class MapDBSource
   }
 
   @Bean(name = "patientPersistentList")
-  public List<Patient> patientBackingList(DB db)
+  public List<Patient> patientBackingList()
   {
     return db
       .indexTreeList("patients", new JsonSerializer<>(Patient.class))

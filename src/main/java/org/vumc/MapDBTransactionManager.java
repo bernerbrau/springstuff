@@ -5,7 +5,7 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc.mapdb;
+package org.vumc;
 
 import org.mapdb.DB;
 import org.springframework.beans.factory.annotation.Autowired;

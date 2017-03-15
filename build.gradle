@@ -14,6 +14,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'war'
 
 jar {
 	baseName = 'continuum'
@@ -24,6 +25,11 @@ sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
+}
+
+war {
+    // Hacky but allows Spring Boot IDEA config to run
+    classpath = classpath.filter {f -> !f.name.toLowerCase().find(/undertow|tomcat|jetty/)}
 }
 
 dependencies {
@@ -38,14 +44,18 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web') {
         exclude module: 'spring-boot-starter-tomcat'
     }
-    compile('org.springframework.boot:spring-boot-starter-undertow')
 
     compile("com.google.guava:guava")
     compile('io.reactivex:rxjava:1.1.6')
     compile("org.mapdb:mapdb:3.0.3")
 
-	runtime('org.springframework.boot:spring-boot-devtools')
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+    //compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+    //compile("org.bitbucket.b_c:jose4j:0.5.0")
+
+    compile('org.springframework.boot:spring-boot-starter-undertow')
+    runtime('org.springframework.boot:spring-boot-devtools')
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
 dependencyManagement {

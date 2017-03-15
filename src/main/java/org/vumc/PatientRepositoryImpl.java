@@ -7,10 +7,7 @@
  */
 package org.vumc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Ordering;
-import org.jetbrains.annotations.NotNull;
-import org.mapdb.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -20,8 +17,6 @@ import rx.Subscription;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
