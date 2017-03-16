@@ -10,6 +10,9 @@ import rx.Observer;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamSource;
+
 @SpringBootApplication
 public class ContinuumApplication
     extends SpringBootServletInitializer
@@ -39,6 +42,14 @@ public class ContinuumApplication
   @Bean(name = "patientObservable")
   Observable<Patient> patientObservable() {
     return patientSubject;
+  }
+
+  @Bean(name = "cdaTransformer")
+  Transformer cdaTransformer() throws Exception {
+    TransformerFactory tFactory = TransformerFactory.newInstance();
+    tFactory.setURIResolver((href, base) -> new StreamSource(getClass().getClassLoader().getResourceAsStream(href)));
+    Transformer transformer = tFactory.newTransformer(new StreamSource(getClass().getClassLoader().getResourceAsStream("toPatientJson.xsl")));
+    return transformer;
   }
 
 }

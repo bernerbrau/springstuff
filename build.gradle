@@ -48,7 +48,7 @@ war {
 	dependsOn buildWebProject
 	from (webProjectOutputDir) {
 		filter{ line -> line
-                .replaceAll(/http:\/\/localhost:8080\//,'/continuum/')
+                .replaceAll(/http:\/\/localhost:\d+\//,'/continuum/')
                 .replaceAll('src="/',
                             'src="/continuum/')
                 .replaceAll('href="/',

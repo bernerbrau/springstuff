@@ -7,31 +7,27 @@
  */
 package org.vumc;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
+import com.google.common.base.MoreObjects;
 
 public class Patient
 {
-  public int                id;
-  public String             mrn;
-  public String             firstName;
-  public String             lastName;
-  public boolean            hasHieData;
-  public Map<String,Object> fields;
+  public int         _id;
+  public PatientId   id;
+  public PatientName name;
+  public String      gender;
+  public String      body;
 
   public Patient() {}
 
   @Override
   public String toString()
   {
-    return com.google.common.base.MoreObjects.toStringHelper(this)
+    return MoreObjects.toStringHelper(this)
+               .add("_id", _id)
                .add("id", id)
-               .add("mrn", mrn)
-               .add("firstName", firstName)
-               .add("lastName", lastName)
-               .add("hasHieData", hasHieData)
-               .add("fields", fields)
+               .add("name", name)
+               .add("gender", gender)
+               .add("body", body)
                .toString();
   }
 }

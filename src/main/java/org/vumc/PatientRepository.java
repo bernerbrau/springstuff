@@ -17,4 +17,6 @@ public interface PatientRepository
   Patient find(int inId);
 
   int getNextId();
+
+  List<Patient> findByIdGreaterThan(int inLatestId);
 }

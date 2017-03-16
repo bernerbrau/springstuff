@@ -55,11 +55,17 @@ public class PatientRepositoryImpl implements PatientRepository
   @Override
   public Patient find(final int inId)
   {
-    return patients.stream().filter(p -> p.id == inId).findFirst().orElse(null);
+    return patients.stream().filter(p -> p._id == inId).findFirst().orElse(null);
   }
 
   public int getNextId() {
-    return patients.stream().map(p -> p.id).max(Ordering.natural()).orElse(0) + 1;
+    return patients.stream().map(p -> p._id).max(Ordering.natural()).orElse(0) + 1;
+  }
+
+  @Override
+  public List<Patient> findByIdGreaterThan(final int inLatestId)
+  {
+    return patients.stream().filter(p -> p._id > inLatestId).collect(Collectors.toList());
   }
 
   @PostConstruct
