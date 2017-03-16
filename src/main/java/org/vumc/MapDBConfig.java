@@ -47,7 +47,7 @@ class JsonSerializer<T> implements Serializer<T>
 public class MapDBConfig
 {
 
-  private DB db = DBMaker.fileDB("patients.db")
+  private DB db = DBMaker.fileDB("patients.cda.db")
                       .checksumHeaderBypass()
                       .transactionEnable()
                       .make();
