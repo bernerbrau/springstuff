@@ -7,6 +7,7 @@
  */
 package org.vumc;
 
+import org.eclipse.collections.impl.factory.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,7 @@ import rx.Subscription;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class WebSocketPatientController
@@ -54,9 +56,15 @@ public class WebSocketPatientController
 
   @PostConstruct
   void subscribeToPatientFeed() {
+    Map<String, Object> headers = Maps.immutable.<String,Object> of(
+        "conversionHint",View.Summary.class
+    ).castToMap();
     subscription = patientObservable.subscribe(
         patient ->
-            webSocketTemplate.convertAndSend("/topic/patients", patient));
+            webSocketTemplate.convertAndSend(
+                "/topic/patients",
+                patient,
+                headers));
   }
 
   @PreDestroy

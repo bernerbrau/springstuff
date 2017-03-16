@@ -7,13 +7,18 @@
  */
 package org.vumc;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.base.MoreObjects;
 
 public class Patient
 {
+  @JsonView(View.Summary.class)
   public int         _id;
+  @JsonView(View.Summary.class)
   public PatientId   id;
+  @JsonView(View.Summary.class)
   public PatientName name;
+  @JsonView(View.Summary.class)
   public String      gender;
   public String      body;
 

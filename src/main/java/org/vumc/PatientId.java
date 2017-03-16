@@ -7,12 +7,16 @@
  */
 package org.vumc;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.base.MoreObjects;
 
 public class PatientId
 {
+  @JsonView(View.Summary.class)
   public String value;
+  @JsonView(View.Summary.class)
   public String root;
+  @JsonView(View.Summary.class)
   public String aaName;
 
   @Override

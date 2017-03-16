@@ -7,6 +7,7 @@
  */
 package org.vumc;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,6 +52,7 @@ public class PatientResource
     this.cdaTransformer = cdaTransformer;
   }
 
+  @JsonView(View.Summary.class)
   @RequestMapping(method = RequestMethod.GET)
   public List<? extends Patient> getPatientList() {
     return patientRepository.findAll();
@@ -62,6 +64,7 @@ public class PatientResource
 //    return patientRepository.findByIdGreaterThan(latestId);
 //  }
 
+  @JsonView(View.Summary.class)
   @RequestMapping(path = "{id}", method = RequestMethod.GET)
   public Patient getPatient(@PathVariable int id) {
     return patientRepository.find(id);
@@ -78,7 +81,8 @@ public class PatientResource
     patientObserver.onNext(inPatient);
   }
 
-  @RequestMapping(path = "cda", method = RequestMethod.POST, consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_XML_VALUE })
+  @JsonView(View.Summary.class)
+  @RequestMapping(path = "cda", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_XML_VALUE })
   public Patient insertPatient(HttpServletRequest inCdaRequest)
       throws TransformerException, IOException
   {
