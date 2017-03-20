@@ -108,32 +108,29 @@
                 <xsl:apply-templates select="n1:ClinicalDocument" mode="json" />
             </xsl:when>
             <xsl:otherwise>
-                <xsl:apply-templates select="*" mode="json"/>
+    {
+        "error": "Unable to display document using CCD style sheet. Document is not a valid CCD as it does not contain a ClinicalDocument xml root element."
+    }
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:template>
-
-    <xsl:template match="*" mode="json">
-        {
-        "error": "Unable to display document using CCD style sheet. Document is not a valid CCD as it does not contain a ClinicalDocument xml root element."
-        }
     </xsl:template>
 
     <xsl:template match="n1:ClinicalDocument" mode="json">
         <xsl:variable name="patientRole" select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole" />
         <xsl:variable name="gender" select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@displayName" />
-        {
+    {
         "id": {
-        "value": "<xsl:value-of select="$patientRole/n1:id/@extension" />"<xsl:if test="$patientRole/n1:id/@assigningAuthorityName">,
-        "aaName": "<xsl:value-of select="$patientRole/n1:id/@assigningAuthorityName" />"</xsl:if><xsl:if test="$patientRole/n1:id/@root">,
-        "root": "<xsl:value-of select="$patientRole/n1:id/@root" />"</xsl:if>
+            "value": "<xsl:value-of select="$patientRole/n1:id/@extension" />"<xsl:if test="$patientRole/n1:id/@assigningAuthorityName">,
+            "aaName": "<xsl:value-of select="$patientRole/n1:id/@assigningAuthorityName" />"</xsl:if><xsl:if test="$patientRole/n1:id/@root">,
+            "root": "<xsl:value-of select="$patientRole/n1:id/@root" />"</xsl:if>
         },
         "name": {
-        <xsl:call-template name="getNameJson"><xsl:with-param name="name" select="$patientRole/n1:patient/n1:name" /></xsl:call-template>
+            <xsl:call-template name="getNameJson"><xsl:with-param name="name" select="$patientRole/n1:patient/n1:name" /></xsl:call-template>
         },
         "gender": "<xsl:value-of select="$gender" />",
+        "dob": "<xsl:value-of select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:birthTime/@value" />",
         "body": "<xsl:call-template name="transformAndSerializeDoc" />"
-        }
+    }
     </xsl:template>
 
     <!-- Get a Name -->

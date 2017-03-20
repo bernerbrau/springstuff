@@ -4,16 +4,18 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.web.WebApplicationInitializer;
-import rx.Observable;
-import rx.Observer;
-import rx.subjects.PublishSubject;
-import rx.subjects.Subject;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 @SpringBootApplication
+@EnableEntityLinks
 public class ContinuumApplication
     extends SpringBootServletInitializer
     implements WebApplicationInitializer
@@ -31,25 +33,22 @@ public class ContinuumApplication
     return builder.sources(ContinuumApplication.class);
   }
 
-  // RxJava patient stream
-  private Subject<Patient, Patient> patientSubject = PublishSubject.<Patient>create().toSerialized();
-
-  @Bean(name = "patientObserver")
-  Observer<Patient> patientObserver() {
-    return patientSubject;
-  }
-
-  @Bean(name = "patientObservable")
-  Observable<Patient> patientObservable() {
-    return patientSubject;
-  }
-
   @Bean(name = "cdaTransformer")
   Transformer cdaTransformer() throws Exception {
     TransformerFactory tFactory = TransformerFactory.newInstance();
     tFactory.setURIResolver((href, base) -> new StreamSource(getClass().getClassLoader().getResourceAsStream(href)));
-    Transformer transformer = tFactory.newTransformer(new StreamSource(getClass().getClassLoader().getResourceAsStream("toPatientJson.xsl")));
-    return transformer;
+    return tFactory.newTransformer(new StreamSource(getClass().getClassLoader().getResourceAsStream("toPatientJson.xsl")));
   }
+
+  @Bean
+  DocumentBuilder documentBuilder() throws Exception {
+    return DocumentBuilderFactory.newInstance().newDocumentBuilder();
+  }
+
+  @Bean
+  XPath xPath() throws Exception {
+    return XPathFactory.newInstance().newXPath();
+  }
+
 
 }

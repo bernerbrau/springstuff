@@ -5,24 +5,25 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc;
+package org.vumc.hypermedia.resources;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.base.MoreObjects;
+import org.springframework.hateoas.ResourceSupport;
+import org.vumc.model.PatientId;
+import org.vumc.model.PatientName;
 
-public class Patient
+import javax.persistence.*;
+import java.time.LocalDate;
+
+public class PatientResource extends ResourceWithEmbeddeds
 {
-  @JsonView(View.Summary.class)
-  public int         _id;
-  @JsonView(View.Summary.class)
+  public long        _id;
   public PatientId   id;
-  @JsonView(View.Summary.class)
   public PatientName name;
-  @JsonView(View.Summary.class)
   public String      gender;
-  public String      body;
+  public LocalDate   dob;
 
-  public Patient() {}
+  public PatientResource() {}
 
   @Override
   public String toString()
@@ -32,7 +33,8 @@ public class Patient
                .add("id", id)
                .add("name", name)
                .add("gender", gender)
-               .add("body", body)
+               .add("dob", dob)
                .toString();
   }
+
 }

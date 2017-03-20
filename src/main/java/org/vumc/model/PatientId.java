@@ -5,27 +5,24 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc;
+package org.vumc.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.base.MoreObjects;
 
-public class PatientName
+public class PatientId
 {
-  @JsonView(View.Summary.class)
-  public String family;
-  @JsonView(View.Summary.class)
-  public String given;
-  @JsonView(View.Summary.class)
-  public String suffix;
+  public String value;
+  public String root;
+  public String aaName;
 
   @Override
   public String toString()
   {
     return MoreObjects.toStringHelper(this)
-               .add("family", family)
-               .add("given", given)
-               .add("suffix", suffix)
+               .add("value", value)
+               .add("root", root)
+               .add("aaName", aaName)
                .toString();
   }
 }
