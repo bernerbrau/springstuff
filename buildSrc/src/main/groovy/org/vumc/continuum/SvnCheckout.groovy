@@ -12,6 +12,7 @@ class SvnCheckout extends DefaultTask {
 
     @TaskAction
     def run() {
+        println("Checking out ${svnUrl} into ${projectDir}")
         def rev = SVNRevision.HEAD
         def repoUrl
         try {

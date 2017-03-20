@@ -42,12 +42,12 @@ node {
 	nodeModulesDir = file(webProjectDir)
 }
 
-npm_install {
+npmInstall {
 	dependsOn checkoutWebProject
 }
 
 npm_run_build {
-	dependsOn npm_install
+	dependsOn npmInstall
 }
 
 war {
