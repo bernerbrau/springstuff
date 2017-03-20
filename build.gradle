@@ -10,7 +10,6 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath "org.tmatesoft.svnkit:svnkit:1.8.15"
         classpath "com.moowork.gradle:gradle-node-plugin:1.1.1"
     }
 }
@@ -31,45 +30,11 @@ def webProjectDir = "$project.projectDir/build/_webProject"
 def webProjectOutputDir = "$project.projectDir/build/_webProject/dist"
 def webProjectSvnUrl = 'https://vcs.mc.vanderbilt.edu/health-it/continuum/web/trunk'
 
+import org.vumc.continuum.SvnCheckout
 
-import org.tmatesoft.svn.core.internal.wc.*
-import org.tmatesoft.svn.core.wc.*
-import org.tmatesoft.svn.core.*
-
-task checkoutWebProject {
-    def svnUrl = webProjectSvnUrl
-
-    def rev = SVNRevision.HEAD
-    def repoUrl
-    try {
-        repoUrl = SVNURL.parseURIEncoded(svnUrl)
-    } catch (SVNException e) {
-        throw new InvalidUserDataException("Invalid svnUrl value: $svnUrl", e)
-    }
-
-    def dir = file(webProjectDir)
-    def performUpdate = false
-    if (dir.exists()) {
-        if (!dir.isDirectory()) {
-            throw new InvalidUserDataException("workspaceDir $dir.absolutePath must be a directory")
-        }
-        if (dir.list()) {
-            performUpdate = true
-        }
-    }
-    try {
-        def clientManager = SVNClientManager.newInstance(
-                // create a local SVN config dir to make sure we don't reuse existing credentials:
-                new DefaultSVNOptions(new File("${System.getProperty("user.home")}/.subversion"), false))
-
-        if (performUpdate) {
-            clientManager.updateClient.doUpdate(dir, rev, SVNDepth.INFINITY, false, false)
-        } else {
-            clientManager.updateClient.doCheckout(repoUrl, dir, SVNRevision.UNDEFINED, rev, SVNDepth.INFINITY, false)
-        }
-    } catch (SVNException e) {
-        throw new InvalidUserDataException((performUpdate ? "svn-update" : "svn-checkout") + " failed for $svnUrl\n" + e.message, e)
-    }
+task checkoutWebProject(type: SvnCheckout) {
+    svnUrl = webProjectSvnUrl
+    projectDir = webProjectDir
 }
 
 node {
@@ -91,40 +56,11 @@ war {
 	from (webProjectOutputDir) {
 		filter{ line -> line
 				.replaceAll(/http:\/\/localhost:\d+\//,'/continuum/')
-				.replaceAll('src="/',
-				'src="/continuum/')
-				.replaceAll('href="/',
-				'href="/continuum/')
-				.replaceAll(/\/(continuum\/){2,}/,
-				'/continuum/')}
+				.replaceAll('src="/','src="/continuum/')
+				.replaceAll('href="/','href="/continuum/')
+				.replaceAll(/\/(continuum\/){2,}/,'/continuum/')}
 	}
 }
-
-/*
-// TODO find a plugin that does this!!
-import org.apache.tools.ant.taskdefs.condition.Os
-
-def webProjectDir = './build/_webProject'
-def webProjectOutputDir = './build/_webProject/dist'
-def webProjectSvnUrl = 'https://vcs.mc.vanderbilt.edu/health-it/continuum/web/trunk'
-
-task buildWebProject {
-	exec {
-		workingDir '.'
-		commandLine 'sh','getWebProject.sh',webProjectSvnUrl,webProjectDir
-    }
-	exec {
-		workingDir webProjectDir
-		commandLine 'npm','install'
-	}
-	exec {
-        workingDir webProjectDir
-		commandLine 'npm','run','build'
-    }
-}
-
-
-*/
 
 // Spring Boot IDEA plugin doesn't recognize "provided", exclude these jars manually instead
 war {
