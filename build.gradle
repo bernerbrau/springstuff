@@ -74,12 +74,13 @@ repositories {
 }
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-hateoas')
-	compile('org.springframework.boot:spring-boot-starter-integration')
-	compile('org.springframework.boot:spring-boot-starter-websocket')
+    // Spring Boot frameworks
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('org.springframework.boot:spring-boot-starter-hateoas')
+	compile('org.springframework.boot:spring-boot-starter-websocket')
+    compile("org.springframework.boot:spring-boot-starter-security")
 
 	// Reactive Streams
 	compile('io.reactivex:rxjava:1.1.6')
@@ -96,9 +97,6 @@ dependencies {
 	compile "org.functionaljava:functionaljava-quickcheck:4.6"
 	compile "org.functionaljava:functionaljava-java-core:4.6"
 
-    // Auto-pluralizes object names.
-    runtime 'org.atteo:evo-inflector:1.2.2'
-
     // Needed to support new Java 8 date types.
     // In JSON...
 	runtime "com.fasterxml.jackson.module:jackson-module-parameter-names"
@@ -108,7 +106,6 @@ dependencies {
     // ...And in Hibernate too.
     runtime "org.hibernate:hibernate-java8:5.0.11.Final"
 
-    //compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     //compile("org.bitbucket.b_c:jose4j:0.5.0")
 
     // Dev-only dependencies. These MUST be excluded in the war {} config above.

@@ -5,7 +5,7 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc;
+package org.vumc.resourcecontrollers;
 
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HapiContext;
@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.vumc.PatientRepository;
 import org.vumc.hypermedia.PatientResourceAssembler;
 import org.vumc.hypermedia.resources.PatientResource;
 import org.vumc.model.Patient;
