@@ -8,9 +8,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 abstract class ResourceWithEmbeddeds extends ResourceSupport {
    
-   @JsonUnwrapped 
-   // The @JsonUnwrapped annotation is required as EmbeddedWrappers are by default serialised in a "_embedded" container, 
-   // that has to be added directly into the top level object
+   @JsonUnwrapped
    private Resources<EmbeddedWrapper> embeddeds;
 
    public Resources<EmbeddedWrapper> getEmbeddeds() {

@@ -60,37 +60,34 @@ war {
 				.replaceAll('href="/','href="/continuum/')
 				.replaceAll(/\/(continuum\/){2,}/,'/continuum/')}
 	}
-}
-
-// Spring Boot IDEA plugin doesn't recognize "provided", exclude these jars manually instead
-war {
-    classpath = classpath.filter {f -> !f.name.toLowerCase().find(/undertow|tomcat|jetty|h2/)}
+    // Spring Boot IDEA plugin doesn't recognize "provided", exclude these jars manually instead
+    classpath = classpath.filter {f -> !f.name.toLowerCase().find(/undertow|tomcat|jetty|h2|ojdbc/)}
 }
 
 sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
+    maven {
+        url 'http://maven.jahia.org/maven2/'
+    }
 }
-
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-hateoas') {
-        exclude module: 'spring-boot-starter-tomcat'
-    }
+	compile('org.springframework.boot:spring-boot-starter-hateoas')
 	compile('org.springframework.boot:spring-boot-starter-integration')
-	compile('org.springframework.boot:spring-boot-starter-websocket') {
-        exclude module: 'spring-boot-starter-tomcat'
-    }
-    compile('org.springframework.boot:spring-boot-starter-web') {
-        exclude module: 'spring-boot-starter-tomcat'
-    }
+	compile('org.springframework.boot:spring-boot-starter-websocket')
+    compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    runtime("com.h2database:h2:1.4.194")
 
 	// Reactive Streams
 	compile('io.reactivex:rxjava:1.1.6')
+
+    // HL7
+    compile 'ca.uhn.hapi:hapi-base:2.2'
+    compile 'ca.uhn.hapi:hapi-structures-v22:2.2'
+    compile 'ca.uhn.hapi:hapi-structures-v25:2.2'
 
 	// Convenience libraries
 	compile("com.google.guava:guava:21.0")
@@ -99,16 +96,25 @@ dependencies {
 	compile "org.functionaljava:functionaljava-quickcheck:4.6"
 	compile "org.functionaljava:functionaljava-java-core:4.6"
 
-	// Needed to support new Java 8 date types in JSON
-	compile "com.fasterxml.jackson.module:jackson-module-parameter-names"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
-	compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.6"
+    // Auto-pluralizes object names.
+    runtime 'org.atteo:evo-inflector:1.2.2'
+
+    // Needed to support new Java 8 date types.
+    // In JSON...
+	runtime "com.fasterxml.jackson.module:jackson-module-parameter-names"
+    runtime "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
+    runtime "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.6"
+
+    // ...And in Hibernate too.
+    runtime "org.hibernate:hibernate-java8:5.0.11.Final"
 
     //compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     //compile("org.bitbucket.b_c:jose4j:0.5.0")
 
-    compile('org.springframework.boot:spring-boot-starter-undertow')
+    // Dev-only dependencies. These MUST be excluded in the war {} config above.
     runtime('org.springframework.boot:spring-boot-devtools')
+    runtime("com.h2database:h2:1.4.194")
+    runtime('com.oracle:ojdbc6:12.1.0.2')
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

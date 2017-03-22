@@ -7,33 +7,35 @@
  */
 package org.vumc.hypermedia.resources;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
-import org.springframework.hateoas.ResourceSupport;
-import org.vumc.model.PatientId;
 import org.vumc.model.PatientName;
 
-import javax.persistence.*;
+import javax.persistence.Embedded;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.time.LocalDate;
 
 public class PatientResource extends ResourceWithEmbeddeds
 {
-  public long        _id;
-  public PatientId   id;
+  @JsonProperty("_id")
+  public long        id;
+  public String      patientId;
   public PatientName name;
   public String      gender;
   public LocalDate   dob;
-
-  public PatientResource() {}
 
   @Override
   public String toString()
   {
     return MoreObjects.toStringHelper(this)
-               .add("_id", _id)
                .add("id", id)
+               .add("patientId", patientId)
                .add("name", name)
                .add("gender", gender)
                .add("dob", dob)
+               .add("links", getLinks())
                .toString();
   }
 

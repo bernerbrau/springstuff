@@ -8,7 +8,6 @@
 package org.vumc.model;
 
 import com.google.common.base.MoreObjects;
-import org.vumc.hypermedia.resources.PatientResource;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -17,13 +16,16 @@ import java.time.LocalDate;
 public class Patient
 {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  public long        _id;
-  @Embedded
-  public PatientId   id;
+  @GeneratedValue(strategy=GenerationType.SEQUENCE,generator="PATIENT_SEQ")
+  @SequenceGenerator(name="PATIENT_SEQ",sequenceName="PATIENT_SEQ",allocationSize=1)
+  public long        id;
+  @Column(length=30)
+  public String      patientId;
   @Embedded
   public PatientName name;
+  @Column(length=1)
   public String      gender;
+
   public LocalDate   dob;
   @Lob
   public String      body;
@@ -34,10 +36,11 @@ public class Patient
   public String toString()
   {
     return MoreObjects.toStringHelper(this)
-               .add("_id", _id)
                .add("id", id)
+               .add("patientId", patientId)
                .add("name", name)
                .add("gender", gender)
+               .add("dob", dob)
                .add("body", body)
                .toString();
   }

@@ -33,23 +33,22 @@ public class PatientResourceAssembler extends EmbeddableResourceAssemblerSupport
   @Override
   public Link linkToSingleResource(final Patient patient)
   {
-    return entityLinks.linkToSingleResource(PatientResource.class, patient._id);
+    return entityLinks.linkToSingleResource(PatientResource.class, patient.id);
   }
 
   @Override
   public PatientResource toResource(final Patient patient)
   {
-    final PatientResource patientRes = createResourceWithId(patient._id, patient);
-    patientRes.add(
-        linkTo(methodOn(PatientResourceController.class).getPatientHtml(patient._id)).withRel("content"));
+    final PatientResource patientRes = createResourceWithId(patient.id, patient);
+    patientRes.add(linkTo(methodOn(PatientResourceController.class).getPatientHtml(patient.id)).withRel("content"));
     return patientRes;
   }
 
   @Override
   protected PatientResource instantiateResource(Patient patient) {
     PatientResource patientRes = new PatientResource();
-    patientRes._id = patient._id;
     patientRes.id = patient.id;
+    patientRes.patientId = patient.patientId;
     patientRes.name = patient.name;
     patientRes.gender = patient.gender;
     patientRes.dob = patient.dob;

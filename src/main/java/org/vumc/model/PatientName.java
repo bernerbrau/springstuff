@@ -9,10 +9,15 @@ package org.vumc.model;
 
 import com.google.common.base.MoreObjects;
 
+import javax.persistence.Column;
+
 public class PatientName
 {
+  @Column(length=30)
   public String family;
+  @Column(length=30)
   public String given;
+  @Column(length=10)
   public String suffix;
 
   @Override

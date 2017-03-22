@@ -119,11 +119,7 @@
         <xsl:variable name="patientRole" select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole" />
         <xsl:variable name="gender" select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@displayName" />
     {
-        "id": {
-            "value": "<xsl:value-of select="$patientRole/n1:id/@extension" />"<xsl:if test="$patientRole/n1:id/@assigningAuthorityName">,
-            "aaName": "<xsl:value-of select="$patientRole/n1:id/@assigningAuthorityName" />"</xsl:if><xsl:if test="$patientRole/n1:id/@root">,
-            "root": "<xsl:value-of select="$patientRole/n1:id/@root" />"</xsl:if>
-        },
+        "patientId": "<xsl:value-of select="$patientRole/n1:id/@extension" />",
         "name": {
             <xsl:call-template name="getNameJson"><xsl:with-param name="name" select="$patientRole/n1:patient/n1:name" /></xsl:call-template>
         },

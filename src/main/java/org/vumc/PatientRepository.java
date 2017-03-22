@@ -9,12 +9,15 @@ package org.vumc;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+import org.vumc.hypermedia.resources.PatientResource;
 import org.vumc.model.*;
 
 import java.util.List;
 
+@Repository
 public interface PatientRepository extends CrudRepository<Patient, Long>
 {
   @Query
-  List<? extends org.vumc.hypermedia.resources.PatientResource> findByIdGreaterThan(int inLatestId);
+  List<? extends PatientResource> findByIdGreaterThan(int inLatestId);
 }
