@@ -57,8 +57,9 @@ war {
 		filter{ line -> line
 				.replaceAll(/http:\/\/localhost:\d+\//,'/continuum/')
 				.replaceAll('src="/','src="/continuum/')
-				.replaceAll('href="/','href="/continuum/')
-				.replaceAll(/\/(continuum\/){2,}/,'/continuum/')}
+                .replaceAll('href="/','href="/continuum/')
+                .replaceAll(/url\(\//,'url(/continuum/')
+                .replaceAll(/\/(continuum\/){2,}/,'/continuum/')}
 	}
     // Spring Boot IDEA plugin doesn't recognize "provided", exclude these jars manually instead
     classpath = classpath.filter {f -> !f.name.toLowerCase().find(/undertow|tomcat|jetty|h2|ojdbc/)}

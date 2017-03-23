@@ -9,6 +9,7 @@
     <wls:container-descriptor>
         <wls:prefer-application-packages>
             <wls:package-name>org.slf4j</wls:package-name>
+            <wls:package-name>javassist</wls:package-name>
         </wls:prefer-application-packages>
     </wls:container-descriptor>
 </wls:weblogic-web-app>

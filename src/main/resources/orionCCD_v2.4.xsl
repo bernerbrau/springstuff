@@ -48,7 +48,7 @@
 		<html>
 			<head>
 				<!-- <meta name='Generator' content='&CDA-Stylesheet;'/> -->
-				<link href="http://www.orionhealth.com/software/ccd/style/skin_v2.4.css" rel="stylesheet" type="text/css" />
+				<link href="https://www.orionhealth.com/software/ccd/style/skin_v2.4.css" rel="stylesheet" type="text/css" />
 				<xsl:comment>Do NOT edit this HTML directly, it was generated via an XSLt transformation from the original release 2 CDA Document.</xsl:comment>
 				<title>
 					<xsl:value-of select="$title" />

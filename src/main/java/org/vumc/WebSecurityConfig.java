@@ -20,6 +20,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.sql.DataSource;
 
@@ -27,12 +30,24 @@ import javax.sql.DataSource;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 {
+  private final Environment environment;
   private JdbcUserDetailsManager userDetailsManager;
+
+  @Autowired
+  public WebSecurityConfig(final Environment inEnvironment)
+  {
+    environment = inEnvironment;
+  }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     // TODO - research if we need to keep this!
     http.csrf().disable();
+    if (environment.acceptsProfiles("war")) {
+      http.headers().frameOptions().sameOrigin();
+    } else {
+      http.headers().frameOptions().disable();
+    }
     http.authorizeRequests()
         .anyRequest()
         .permitAll();
@@ -49,8 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
   @Autowired
   public void configureGlobal(AuthenticationManagerBuilder auth,
                               DataSource dataSource,
-                              PasswordEncoder passwordEncoder,
-                              Environment environment) throws Exception {
+                              PasswordEncoder passwordEncoder) throws Exception {
     JdbcUserDetailsManagerConfigurer<AuthenticationManagerBuilder>
         jdbc = auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(passwordEncoder);
 
@@ -59,7 +73,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     }
 
     this.userDetailsManager = jdbc.getUserDetailsService();
+  }
 
+  @Bean
+  public WebMvcConfigurer corsConfigurer() {
+    return new WebMvcConfigurerAdapter() {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+        if (!environment.acceptsProfiles("war")) {
+          registry.addMapping("/api/**");
+        }
+      }
+    };
   }
 
   @Bean
@@ -68,8 +93,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 	}
 
 	@Bean
-  public PasswordEncoder passwordEncoder(Environment environment) {
-    if (environment.acceptsProfiles("jndi")) {
+  public PasswordEncoder passwordEncoder() {
+    if (environment.acceptsProfiles("war")) {
       return new BCryptPasswordEncoder(11);
     } else {
       return new BCryptPasswordEncoder(4);
