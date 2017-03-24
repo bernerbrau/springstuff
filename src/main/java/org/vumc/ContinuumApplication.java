@@ -25,8 +25,8 @@ public class ContinuumApplication
   public static void main(String[] args) throws Exception
   {
     new SpringApplicationBuilder(ContinuumApplication.class)
-//        .profiles("local") // Uncomment for in-memory DB
-        .profiles("oracledev") // Uncomment for Oracle DEV DB
+        .profiles("local") // Uncomment for in-memory DB
+//        .profiles("oracledev") // Uncomment for Oracle DEV DB
         .run(args);
   }
 

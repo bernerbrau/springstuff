@@ -69,7 +69,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         jdbc = auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(passwordEncoder);
 
     if (environment.acceptsProfiles("local")) {
-      jdbc.withDefaultSchema();
+      jdbc.withDefaultSchema()
+        .withUser("testuser")
+        .password("testpass")
+        .authorities("*");
     }
 
     this.userDetailsManager = jdbc.getUserDetailsService();
