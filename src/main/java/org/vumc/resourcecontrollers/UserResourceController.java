@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.vumc.jwt.JWTTokenProvider;
 import org.vumc.resourcecontrollers.model.UserNameAndPassword;
 
 import java.util.Collections;
@@ -32,23 +33,26 @@ public class UserResourceController
     private final AuthenticationManager authManager;
     private final UserDetailsManager userService;
     private final PasswordEncoder passwordEncoder;
+    private final JWTTokenProvider tokenProvider;
 
     @Autowired
     public UserResourceController(AuthenticationManager authManager,
                                   UserDetailsManager userService,
-                                  PasswordEncoder passwordEncoder) {
+                                  PasswordEncoder passwordEncoder,
+                                  JWTTokenProvider tokenProvider) {
         this.authManager = authManager;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.tokenProvider = tokenProvider;
     }
 
-    @RequestMapping(value="/authenticate", method=RequestMethod.POST)
-    public ResponseEntity<UserDetails> authenticate(@RequestBody UserNameAndPassword req) {
-        // needs to return a JWT token in the response
+    @RequestMapping(value="/authenticate", method=RequestMethod.POST, produces = "application/jwt")
+    public ResponseEntity<String> authenticate(@RequestBody UserNameAndPassword req) {
         try {
             Authentication auth =
-                authManager.authenticate(new UsernamePasswordAuthenticationToken(req.username, req.password));
-            return new ResponseEntity<>(userService.loadUserByUsername(req.username), HttpStatus.OK);
+                authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(req.username, req.password));
+            return new ResponseEntity<>(tokenProvider.newToken(auth), HttpStatus.OK);
         } catch (AuthenticationException ex) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
