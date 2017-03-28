@@ -24,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -78,6 +79,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         .anyRequest().hasAnyAuthority("provider","*");
 
     http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+    http.addFilterAfter(new AnonymousAuthenticationFilter("anon"),
+        UsernamePasswordAuthenticationFilter.class);
   }
 
   @Bean
