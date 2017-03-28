@@ -33,7 +33,7 @@ public class JWTAuthenticationToken extends AbstractAuthenticationToken
   private JWTAuthenticationToken(final DecodedJWT jwtToken)
   {
     super(getAuthorities(jwtToken));
-    this.jwtToken = null;
+    this.jwtToken = jwtToken.getToken();
     this.principal = jwtToken.getSubject();
   }
 

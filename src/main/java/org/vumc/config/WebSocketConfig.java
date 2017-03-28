@@ -5,7 +5,7 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc;
+package org.vumc.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

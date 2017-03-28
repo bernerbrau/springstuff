@@ -5,7 +5,7 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc;
+package org.vumc.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
@@ -13,11 +13,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.provisioning.JdbcUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.core.userdetails.cache.SpringCacheBasedUserCache;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,13 +28,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.vumc.jwt.JWTAuthenticationFilter;
-import org.vumc.jwt.JWTAuthenticationProvider;
+import org.vumc.login.JSONLoginConfigurer;
+import org.vumc.login.UsernamePasswordJSONAuthenticationFilter;
+import org.vumc.jwt.JWTSecurityContextRepository;
 
 import javax.sql.DataSource;
 
@@ -39,19 +43,19 @@ import javax.sql.DataSource;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 {
-  private final Environment                  environment;
-  private final JWTAuthenticationProvider    jwtProvider;
-  private final JWTAuthenticationFilter      jwtFilter;
-  private       JdbcUserDetailsManager       userDetailsManager;
+  private final Environment                       environment;
+  private final JWTSecurityContextRepository      jwtRepo;
+  private final JSONLoginConfigurer<HttpSecurity> loginConfigurer;
+  private       JdbcUserDetailsManager            userDetailsManager;
 
   @Autowired
   public WebSecurityConfig(final Environment inEnvironment,
-                           final JWTAuthenticationProvider jwtProvider,
-                           final JWTAuthenticationFilter jwtFilter)
+                           final JWTSecurityContextRepository jwtRepo,
+                           final JSONLoginConfigurer<HttpSecurity> loginConfigurer)
   {
     environment = inEnvironment;
-    this.jwtProvider = jwtProvider;
-    this.jwtFilter = jwtFilter;
+    this.jwtRepo = jwtRepo;
+    this.loginConfigurer = loginConfigurer;
   }
 
   @Override
@@ -65,10 +69,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
       http.headers().frameOptions().disable();
     }
 
+    http.sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+    http.apply(loginConfigurer)
+        .loginPage("/")
+        .loginProcessingUrl("/api/users/authenticate")
+        .permitAll();
+
     http.authorizeRequests()
+        .requestMatchers(r -> r.getMethod().equals("OPTIONS")).permitAll()
         .antMatchers(
             "/",
-            "/api/users/authenticate",
             "**/*.html",
             "**/*.css",
             "**/*.js",
@@ -78,9 +90,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         .antMatchers(HttpMethod.POST, "/api/patients/c32").hasAnyAuthority("patientSource","*")
         .anyRequest().hasAnyAuthority("provider","*");
 
-    http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+    http.addFilterAt(new SecurityContextPersistenceFilter(jwtRepo),
+        SecurityContextPersistenceFilter.class);
     http.addFilterAfter(new AnonymousAuthenticationFilter("anon"),
-        UsernamePasswordAuthenticationFilter.class);
+        UsernamePasswordJSONAuthenticationFilter.class);
+
+    http.exceptionHandling().authenticationEntryPoint((req, res, e) -> {
+      res.setStatus(HttpStatus.UNAUTHORIZED.value());
+      res.flushBuffer();
+    });
   }
 
   @Bean
@@ -89,7 +107,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         if (!environment.acceptsProfiles("war")) {
-          registry.addMapping("/api/**");
+          registry.addMapping("/**");
         }
       }
     };
@@ -115,8 +133,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     }
 
     this.userDetailsManager = jdbc.getUserDetailsService();
-
-    auth.authenticationProvider(jwtProvider);
   }
 
   @Bean

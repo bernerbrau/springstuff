@@ -5,7 +5,7 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc;
+package org.vumc.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

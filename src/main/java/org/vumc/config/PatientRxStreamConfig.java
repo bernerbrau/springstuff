@@ -5,12 +5,12 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc.rx;
+package org.vumc.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.vumc.PatientRepository;
+import org.vumc.repository.PatientRepository;
 import org.vumc.model.Patient;
 import org.vumc.transformations.Transformations;
 import rx.Observable;

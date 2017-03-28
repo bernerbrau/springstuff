@@ -12,7 +12,7 @@ import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.stereotype.Component;
-import org.vumc.resourcecontrollers.PatientResourceController;
+import org.vumc.controllers.PatientResourceController;
 import org.vumc.hypermedia.resources.PatientResource;
 import org.vumc.model.Patient;
 

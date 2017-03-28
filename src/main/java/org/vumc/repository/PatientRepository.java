@@ -5,7 +5,7 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc;
+package org.vumc.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
