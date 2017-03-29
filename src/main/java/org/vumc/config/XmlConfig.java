@@ -27,7 +27,7 @@ public class XmlConfig
   Transformer cdaTransformer() throws Exception {
     TransformerFactory tFactory = TransformerFactory.newInstance();
     tFactory.setURIResolver((href, base) -> new StreamSource(ContinuumApplication.class.getClassLoader().getResourceAsStream(href)));
-    return tFactory.newTransformer(new StreamSource(ContinuumApplication.class.getResourceAsStream("toPatientJson.xsl")));
+    return tFactory.newTransformer(new StreamSource(ContinuumApplication.class.getClassLoader().getResourceAsStream("toPatientJson.xsl")));
   }
 
   @Bean
