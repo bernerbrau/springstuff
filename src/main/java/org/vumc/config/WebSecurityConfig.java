@@ -72,19 +72,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     http.authorizeRequests()
         .requestMatchers(r -> "OPTIONS".equals(r.getMethod())).permitAll()
         .antMatchers(
+            // Angular2 routes
             "/",
+            "/login",
+            "/patients",
+            "/patients/*",
+
+            // Public portions of the API
             "/api",
             "/api/login",
             "/api/patients/c32",
             "/api/profile",
             "/api/profile/**",
+
+            // Static files
             "**/*.html",
             "**/*.css",
             "**/*.js",
             "/public/**",
-            "/stomp/**",
-            "favicon.ico").permitAll()
-//      TODO x509 client authentication should permit this
+            "favicon.ico",
+
+            // TODO secure the STOMP endpoint
+            "/stomp/**"
+        ).permitAll()
+//      TODO x509 client authentication
 //        .antMatchers(HttpMethod.POST, "/api/patients/c32").hasAnyAuthority("patientSource","*")
         .anyRequest().hasAnyAuthority("provider","*");
 
