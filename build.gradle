@@ -78,7 +78,7 @@ dependencies {
     // Spring Boot frameworks
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-starter-data-rest')
 	compile('org.springframework.boot:spring-boot-starter-hateoas')
 	compile('org.springframework.boot:spring-boot-starter-websocket')
     compile("org.springframework.boot:spring-boot-starter-security")
@@ -100,9 +100,9 @@ dependencies {
 
     // Needed to support new Java 8 date types.
     // In JSON...
-	runtime "com.fasterxml.jackson.module:jackson-module-parameter-names"
-    runtime "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
-    runtime "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.6"
+    compile "com.fasterxml.jackson.module:jackson-module-parameter-names"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.6"
 
     // ...And in Hibernate too.
     runtime "org.hibernate:hibernate-java8:5.0.11.Final"

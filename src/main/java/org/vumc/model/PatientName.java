@@ -19,6 +19,8 @@ public class PatientName
   public String given;
   @Column(length=10)
   public String suffix;
+  @Column(length=100)
+  public String name;
 
   @Override
   public String toString()
@@ -27,6 +29,7 @@ public class PatientName
                .add("family", family)
                .add("given", given)
                .add("suffix", suffix)
+               .add("name", name)
                .toString();
   }
 }

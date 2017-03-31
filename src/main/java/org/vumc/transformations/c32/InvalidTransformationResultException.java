@@ -5,7 +5,7 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc.transformations;
+package org.vumc.transformations.c32;
 
 public class InvalidTransformationResultException extends RuntimeException
 {

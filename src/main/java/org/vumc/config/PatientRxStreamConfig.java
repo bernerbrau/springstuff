@@ -7,23 +7,26 @@
  */
 package org.vumc.config;
 
+import com.google.common.base.Charsets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.vumc.repository.PatientRepository;
 import org.vumc.model.Patient;
-import org.vumc.transformations.Transformations;
+import org.vumc.repository.PatientRepository;
+import org.vumc.transformations.c32.PatientC32Converter;
 import rx.Observable;
 import rx.Observer;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
 import javax.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
 
 @Configuration
 public class PatientRxStreamConfig
 {
-  private final Transformations transformations;
+  private final PatientC32Converter patientC32Converter;
+  private final PatientRepository patientRepository;
 
   // patient stream
   private Subject<Patient, Patient> patientSubject =
@@ -34,13 +37,15 @@ public class PatientRxStreamConfig
       PublishSubject.<String>create().toSerialized();
 
   @Autowired
-  PatientRxStreamConfig(Transformations transformations) {
-    this.transformations = transformations;
+  PatientRxStreamConfig(PatientC32Converter patientC32Converter,
+                        PatientRepository patientRepository) {
+    this.patientC32Converter = patientC32Converter;
+    this.patientRepository = patientRepository;
   }
 
   @Bean(name = "patientObservable")
-  Observable<Patient> patientObservable(PatientRepository inRepository) {
-    return patientSubject.map(inRepository::save).retry();
+  Observable<Patient> patientObservable(PatientRepository repository) {
+    return patientSubject.map(repository::save).retry();
   }
 
   @Bean(name = "patientObserver")
@@ -54,12 +59,12 @@ public class PatientRxStreamConfig
   }
 
   @PostConstruct
-  void feedPatientXMLToPatientStream() {
+  void setupC32PatientStream() {
     patientXMLSubject
-        .map(transformations::extractC32Document)
-        .map(transformations::c32DocumentToPatientJsonString)
-        .map(transformations::checkJsonForErrorResult)
-        .map(transformations.jsonToObject(Patient.class)::apply)
+        .map(s -> new ByteArrayInputStream(s.getBytes(Charsets.UTF_8)))
+        .map(patientC32Converter::convert)
+        .retry()
+        .map(patientRepository::save)
         .retry()
         .subscribe(patientSubject);
   }
