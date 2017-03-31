@@ -50,7 +50,6 @@ public class Patient
                .add("name", name)
                .add("gender", gender)
                .add("dob", dob)
-               .add("body", body)
                .toString();
   }
 

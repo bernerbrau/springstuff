@@ -37,67 +37,27 @@ import java.io.StringWriter;
 public class WebSocketPatientController
 {
 
-  public static final String APPLICATION_TYPE = "application";
-  public static final String HAL_JSON_SUBTYPE = "hal+json";
-  public static final String HAL_JSON_TYPE = APPLICATION_TYPE + "/" + HAL_JSON_SUBTYPE;
-
   private Observable<Patient> patientObservable;
   private SimpMessagingTemplate                              webSocketTemplate;
   private Subscription                                       subscription;
-  private PersistentEntityResourceAssembler                  assembler;
-  private TypeConstrainedMappingJackson2HttpMessageConverter jacksonHttpMessageConverter;
 
   @Autowired
   public WebSocketPatientController(
         @Qualifier("patientObservable")
         final Observable<Patient> inPatientObservable,
-        final SimpMessagingTemplate inWebSocketTemplate,
-        final PersistentEntityResourceAssembler inPersistentEntityResourceAssembler,
-        final TypeConstrainedMappingJackson2HttpMessageConverter jacksonHttpMessageConverter)
+        final SimpMessagingTemplate inWebSocketTemplate)
   {
     patientObservable = inPatientObservable;
     webSocketTemplate = inWebSocketTemplate;
-    assembler = inPersistentEntityResourceAssembler;
-    this.jacksonHttpMessageConverter = jacksonHttpMessageConverter;
   }
 
   @PostConstruct
   void subscribeToPatientFeed() {
     subscription = patientObservable.subscribe(
         patient ->
-            webSocketTemplate.send(
+            webSocketTemplate.convertAndSend(
                 "/topic/patients",
-                convert(patient)));
-  }
-
-  private Message<?> convert(final Patient inPatient)
-  {
-    ResourceSupport resource = assembler.toFullResource(inPatient);
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    // TODO add link processors
-    try
-    {
-      jacksonHttpMessageConverter
-          .write(resource, new MediaType(APPLICATION_TYPE, HAL_JSON_SUBTYPE), new HttpOutputMessage()
-          {
-            @Override
-            public OutputStream getBody() throws IOException
-            {
-              return output;
-            }
-
-            @Override
-            public HttpHeaders getHeaders()
-            {
-              return new HttpHeaders();
-            }
-          });
-      output.flush();
-    } catch (IOException e) {
-      throw new RuntimeException("Could not convert Patient to HAL+JSON", e);
-    }
-
-    return new GenericMessage<>(output.toByteArray(), ImmutableMap.of(MessageHeaders.CONTENT_TYPE, HAL_JSON_TYPE));
+                patient));
   }
 
   @PreDestroy
