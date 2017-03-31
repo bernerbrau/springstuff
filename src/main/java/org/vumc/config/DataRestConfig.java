@@ -7,6 +7,7 @@
  */
 package org.vumc.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -49,29 +50,25 @@ public class DataRestConfig
   }
 
   @Bean
+  @ConditionalOnProperty(name = "enableCORS", havingValue = "true")
   public FilterRegistrationBean corsFilter(Environment environment) {
-    if (!environment.acceptsProfiles("war"))
-    {
-      UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-      CorsConfiguration config = new CorsConfiguration();
-      config.setAllowCredentials(true);
-      config.addExposedHeader("X-Auth-Token");
-      config.addAllowedOrigin("*");
-      config.addAllowedHeader("*");
-      config.addAllowedMethod("OPTIONS");
-      config.addAllowedMethod("HEAD");
-      config.addAllowedMethod("GET");
-      config.addAllowedMethod("PUT");
-      config.addAllowedMethod("POST");
-      config.addAllowedMethod("DELETE");
-      config.addAllowedMethod("PATCH");
-      source.registerCorsConfiguration("/**", config);
-      final FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-      bean.setOrder(0);
-      return bean;
-    } else {
-      return new FilterRegistrationBean();
-    }
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowCredentials(true);
+    config.addExposedHeader("X-Auth-Token");
+    config.addAllowedOrigin("*");
+    config.addAllowedHeader("*");
+    config.addAllowedMethod("OPTIONS");
+    config.addAllowedMethod("HEAD");
+    config.addAllowedMethod("GET");
+    config.addAllowedMethod("PUT");
+    config.addAllowedMethod("POST");
+    config.addAllowedMethod("DELETE");
+    config.addAllowedMethod("PATCH");
+    source.registerCorsConfiguration("/**", config);
+    final FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+    bean.setOrder(0);
+    return bean;
   }
 
   @Bean

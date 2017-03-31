@@ -8,6 +8,7 @@
 package org.vumc.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +33,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.vumc.jwt.JWTSecurityContextRepository;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.sql.DataSource;
 
 @Configuration
@@ -67,11 +70,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     http.authorizeRequests()
         .requestMatchers(r -> "OPTIONS".equals(r.getMethod())).permitAll()
         .antMatchers(
+            // Angular2 compiled files
+            "/index.html",
+            "/*.js",
+
             // Angular2 routes
             "/",
             "/login",
-            "/patients",
-            "/patients/*",
 
             // Public portions of the API
             "/api",
@@ -96,14 +101,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 
     http.anonymous().authorities("anon");
 
-    http.removeConfigurer(SessionManagementConfigurer.class);
+    http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    http.securityContext().securityContextRepository(jwtRepo);
 
-    http.addFilterAt(new SecurityContextPersistenceFilter(jwtRepo),
-        SecurityContextPersistenceFilter.class);
-
-    http.exceptionHandling().authenticationEntryPoint((req, res, e) -> {
-      res.setStatus(HttpStatus.UNAUTHORIZED.value());
-    });
+    http.exceptionHandling().authenticationEntryPoint((req, res, e) ->
+      res.setStatus(HttpStatus.UNAUTHORIZED.value())
+    );
   }
 
   @Bean
