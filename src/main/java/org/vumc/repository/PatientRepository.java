@@ -9,8 +9,7 @@ package org.vumc.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.vumc.model.*;
+import org.vumc.model.Patient;
 
 @RepositoryRestResource
 public interface PatientRepository extends CrudRepository<Patient, Long>

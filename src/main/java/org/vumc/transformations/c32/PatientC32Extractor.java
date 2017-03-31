@@ -14,12 +14,11 @@ import org.vumc.model.PatientName;
 import org.w3c.dom.Node;
 
 import javax.xml.transform.TransformerException;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 
 @Component
 class PatientC32Extractor

@@ -1,10 +1,14 @@
 package org.vumc.continuum
 
-import org.gradle.api.*
-import org.gradle.api.tasks.*
-import org.tmatesoft.svn.core.internal.wc.*
-import org.tmatesoft.svn.core.wc.*
-import org.tmatesoft.svn.core.*
+import org.gradle.api.DefaultTask
+import org.gradle.api.InvalidUserDataException
+import org.gradle.api.tasks.TaskAction
+import org.tmatesoft.svn.core.SVNDepth
+import org.tmatesoft.svn.core.SVNException
+import org.tmatesoft.svn.core.SVNURL
+import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions
+import org.tmatesoft.svn.core.wc.SVNClientManager
+import org.tmatesoft.svn.core.wc.SVNRevision
 
 class SvnCheckout extends DefaultTask {
     public String svnUrl

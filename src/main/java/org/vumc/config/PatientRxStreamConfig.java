@@ -32,7 +32,7 @@ public class PatientRxStreamConfig
   private Subject<Patient, Patient> patientSubject =
       PublishSubject.<Patient>create().toSerialized();
 
-  // raw patient XML stream
+  // patient C32 input stream
   private Subject<String, String> patientXMLSubject =
       PublishSubject.<String>create().toSerialized();
 
@@ -44,12 +44,7 @@ public class PatientRxStreamConfig
   }
 
   @Bean(name = "patientObservable")
-  Observable<Patient> patientObservable(PatientRepository repository) {
-    return patientSubject.map(repository::save).retry();
-  }
-
-  @Bean(name = "patientObserver")
-  Observer<Patient> patientObserver() {
+  Observable<Patient> patientObservable() {
     return patientSubject;
   }
 
@@ -60,12 +55,10 @@ public class PatientRxStreamConfig
 
   @PostConstruct
   void setupC32PatientStream() {
-    patientXMLSubject
+    patientXMLSubject.retry()
         .map(s -> new ByteArrayInputStream(s.getBytes(Charsets.UTF_8)))
         .map(patientC32Converter::convert)
-        .retry()
         .map(patientRepository::save)
-        .retry()
         .subscribe(patientSubject);
   }
 

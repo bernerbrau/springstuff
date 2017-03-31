@@ -9,12 +9,11 @@ package org.vumc.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.vumc.repository.PatientRepository;
 import org.vumc.model.Patient;
+import org.vumc.repository.PatientRepository;
 import rx.Observer;
 
 import javax.xml.transform.TransformerException;
