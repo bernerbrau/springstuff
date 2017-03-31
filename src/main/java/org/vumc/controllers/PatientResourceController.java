@@ -37,7 +37,7 @@ public class PatientResourceController
 
   @RequestMapping(path = "c32", method = RequestMethod.POST,
                   consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_XML_VALUE })
-  public void insertPatient(@RequestBody String inCdaRequest)
+  public void postC32Document(@RequestBody String inCdaRequest)
       throws TransformerException, IOException
   {
     patientXMLObserver.onNext(inCdaRequest);

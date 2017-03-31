@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.vumc.controllers.PatientResourceController;
 import org.vumc.model.Patient;
 
-import static org.springframework.hateoas.core.DummyInvocationUtils.methodOn;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @Component
@@ -22,11 +22,12 @@ public class PatientLinkProcessor implements ResourceProcessor<Resource<Patient>
   @Override
   public Resource<Patient> process(final Resource<Patient> resource)
   {
-    if (resource.getContent().body != null)
+    Patient patient = resource.getContent();
+    if (patient.body != null)
     {
       resource.add(linkTo(
           methodOn(PatientResourceController.class)
-              .getHtml(resource.getContent().id))
+              .getHtml(patient.id))
                        .withRel("content"));
     }
     return resource;
