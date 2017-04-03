@@ -7,13 +7,14 @@
  */
 package org.vumc.weblogic;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 // HACK to fix this problem: https://github.com/spring-projects/spring-boot/issues/2643
@@ -25,17 +26,15 @@ public class WeblogicAnnotationConfigEmbeddedWebApplicationContext
   {
     Collection<ServletContextInitializer> initializers = super.getServletContextInitializerBeans();
 
-    List<ServletContextInitializer> filters = initializers.stream()
-                                                 .filter(i -> i.getClass().getName().contains("Filter"))
-                                                 .collect(Collectors.toList());
-    List<ServletContextInitializer> noFilters = initializers.stream()
-                                                     .filter(i -> !i.getClass().getName().contains("Filter"))
-                                                     .collect(Collectors.toList());
+    Map<Boolean, List<ServletContextInitializer>> filtersAndNonFilters
+        = initializers.stream()
+              .collect(Collectors.partitioningBy(
+                  i -> i.getClass().getName().contains("Filter")));
 
-    Collection<ServletContextInitializer> reversedInitializers = new ArrayList<>(initializers.size());
-    reversedInitializers.addAll(noFilters);
-    reversedInitializers.addAll(Lists.reverse(filters));
-
-    return reversedInitializers;
+    return Lists.newArrayList(
+        Iterables.concat(
+            filtersAndNonFilters.get(false),
+            Lists.reverse(filtersAndNonFilters.get(true))
+        ));
   }
 }
