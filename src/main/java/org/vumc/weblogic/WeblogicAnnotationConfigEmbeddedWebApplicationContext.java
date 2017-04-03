@@ -21,6 +21,13 @@ import java.util.stream.Collectors;
 public class WeblogicAnnotationConfigEmbeddedWebApplicationContext
     extends AnnotationConfigEmbeddedWebApplicationContext
 {
+  private final Class<?> filterRegistrationBeanClass =
+      Class.forName("org.springframework.boot.web.servlet.AbstractFilterRegistrationBean");
+
+  public WeblogicAnnotationConfigEmbeddedWebApplicationContext() throws ClassNotFoundException
+  {
+  }
+
   @Override
   protected Collection<ServletContextInitializer> getServletContextInitializerBeans()
   {
@@ -29,7 +36,7 @@ public class WeblogicAnnotationConfigEmbeddedWebApplicationContext
     Map<Boolean, List<ServletContextInitializer>> filtersAndNonFilters
         = initializers.stream()
               .collect(Collectors.partitioningBy(
-                  i -> i.getClass().getName().contains("Filter")));
+                  i -> filterRegistrationBeanClass.isAssignableFrom(i.getClass())));
 
     return Lists.newArrayList(
         Iterables.concat(
