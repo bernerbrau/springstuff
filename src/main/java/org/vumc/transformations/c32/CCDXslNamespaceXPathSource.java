@@ -10,6 +10,7 @@ package org.vumc.transformations.c32;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.xml.SimpleNamespaceContext;
+import org.vumc.transformations.xml.XPathSource;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
@@ -19,13 +20,12 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 @Component
-class CCDXslNamespaceXPathSource
+class CCDXslNamespaceXPathSource implements XPathSource
 {
   private final Map<String, XPathExpression> xPathCache = new WeakHashMap<>();
 
   private final XPath xPath;
 
-  @Autowired
   public CCDXslNamespaceXPathSource() throws Exception
   {
     xPath = XPathFactory.newInstance().newXPath();
@@ -36,7 +36,8 @@ class CCDXslNamespaceXPathSource
     xPath.setNamespaceContext(ns);
   }
 
-  synchronized XPathExpression xpr(String expression) throws XPathExpressionException
+  @Override
+  public synchronized XPathExpression xpr(String expression) throws XPathExpressionException
   {
     XPathExpression xpr = xPathCache.get(expression);
     if (xpr == null) {

@@ -32,4 +32,45 @@ public class PatientName
                .add("name", name)
                .toString();
   }
+
+  public String getFamily()
+  {
+    return family;
+  }
+
+  public void setFamily(final String inFamily)
+  {
+    family = inFamily;
+  }
+
+  public String getGiven()
+  {
+    return given;
+  }
+
+  public void setGiven(final String inGiven)
+  {
+    given = inGiven;
+  }
+
+  public String getSuffix()
+  {
+    return suffix;
+  }
+
+  public void setSuffix(final String inSuffix)
+  {
+    suffix = inSuffix;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(final String inName)
+  {
+    name = inName;
+  }
+
 }

@@ -7,10 +7,13 @@
  */
 package org.vumc.transformations.c32;
 
+import fj.function.TryEffect0;
+import fj.function.TryEffect1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vumc.model.Patient;
 import org.vumc.model.PatientName;
+import org.vumc.transformations.xml.XPathSource;
 import org.w3c.dom.Node;
 
 import javax.xml.transform.TransformerException;
@@ -23,65 +26,82 @@ import java.time.format.DateTimeFormatter;
 @Component
 class PatientC32Extractor
 {
-  private final CCDXslNamespaceXPathSource xPath;
+  private final XPathSource                   xPath;
   private final PatientC32DocumentTransformer transformer;
 
   @Autowired
-  public PatientC32Extractor(final CCDXslNamespaceXPathSource xPath,
+  public PatientC32Extractor(final XPathSource xPath,
                              final PatientC32DocumentTransformer inTransformer)
   {
     this.xPath = xPath;
     transformer = inTransformer;
   }
 
-  Patient extractPatient(Node c32Element) throws XPathExpressionException, TransformerException, IOException {
-    Node patientRole = (Node) xPath.xpr("/n1:ClinicalDocument/n1:recordTarget/n1:patientRole").evaluate(c32Element, XPathConstants.NODE);
-    String gender = (String) xPath.xpr("/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@displayName").evaluate(c32Element, XPathConstants.STRING);
-
-    Patient patient = new Patient();
-    patient.patientId = (String) xPath.xpr("./n1:id/@extension").evaluate(patientRole, XPathConstants.STRING);
-    patient.name = getNameJSON((Node) xPath.xpr("./n1:patient/n1:name").evaluate(patientRole, XPathConstants.NODE));
-    patient.gender = gender;
-    String strDob = (String) xPath.xpr("./n1:patient/n1:birthTime/@value").evaluate(patientRole, XPathConstants.STRING);
-    if (strDob != null && !strDob.isEmpty())
-    {
-      patient.dob = LocalDate.parse(strDob, getDOBFormatter());
-    }
-
-    patient.body = transformAndSerialize(c32Element);
-
-    return patient;
+  Patient extractPatient(Node c32Element)
+      throws XPathExpressionException, TransformerException, IOException
+  {
+      final Patient patient = new Patient();
+      doInNode(c32Element, "/n1:ClinicalDocument/n1:recordTarget/n1:patientRole", roleNode -> {
+          doForString(roleNode, "./n1:id/@extension", patient::setPatientId);
+          doInNode(roleNode, "./n1:patient", patientNode -> {
+              doInNode(patientNode, "./n1:name", nameNode -> {
+                final PatientName name = new PatientName();
+                doInNode(nameNode, "./n1:family",
+                    family ->
+                    {
+                      doForString(nameNode,"./n1:family",name::setFamily);
+                      doForString(nameNode,"./n1:given",name::setGiven);
+                      doForString(nameNode,"./n1:suffix",name::setSuffix);
+                    },
+                    () -> doForString(nameNode,"normalize-space(.)",name::setName)
+                );
+                patient.setName(name);
+              });
+              doForString(patientNode,"./n1:administrativeGenderCode/@displayName",patient::setGender);
+              doForString(patientNode,"./n1:birthTime/@value",
+                  dob -> patient.setDob(LocalDate.parse(dob, DateTimeFormatter.ofPattern("yyyyMMdd"))));
+          });
+      });
+      patient.setBody(transformer.c32DocumentToHTML(c32Element));
+      return patient;
   }
 
-  private String transformAndSerialize(final Node inC32Element) throws TransformerException,
-                                                                       IOException
+  private <E extends Exception>
+  void doInNode(final Node node, final String path, TryEffect1<Node, E> action)
+      throws XPathExpressionException, E
   {
-    return transformer.c32DocumentToHTML(inC32Element);
+    doInNode(node, path, action, () -> {});
   }
 
-  private PatientName getNameJSON(final Node nameNode) throws XPathExpressionException
+  private <E extends Exception>
+  void doForString(final Node node, final String path, TryEffect1<String, E> action)
+      throws XPathExpressionException, E
   {
-    PatientName name = new PatientName();
-    String family = (String) xPath.xpr("./n1:family").evaluate(nameNode, XPathConstants.STRING);
-    if (family != null) {
-      name.family = family;
-      String given = (String) xPath.xpr("./n1:given").evaluate(nameNode, XPathConstants.STRING);
-      if (given != null) {
-        name.given = given;
-      }
-      String suffix = (String) xPath.xpr("./n1:suffix").evaluate(nameNode, XPathConstants.STRING);
-      if (suffix != null) {
-        name.suffix = suffix;
-      }
+    doForString(node, path, action, () -> {});
+  }
+
+  private <E1 extends Exception, E2 extends Exception>
+    void doInNode(final Node node, final String path, TryEffect1<Node, E1> action, TryEffect0<E2> otherwiseAction)
+      throws XPathExpressionException, E1, E2
+  {
+    Node subNode = (Node) xPath.xpr(path).evaluate(node, XPathConstants.NODE);
+    if (subNode != null) {
+        action.f(subNode);
     } else {
-      name.name = (String) xPath.xpr("normalize-space(.)").evaluate(nameNode, XPathConstants.STRING);
+        otherwiseAction.f();
     }
-    return name;
   }
 
-  private DateTimeFormatter getDOBFormatter()
+  private <E1 extends Exception, E2 extends Exception>
+  void doForString(final Node node, final String path, TryEffect1<String, E1> action, TryEffect0<E2> otherwiseAction)
+      throws XPathExpressionException, E1, E2
   {
-    return DateTimeFormatter.ofPattern("yyyyMMdd");
+    String value = (String) xPath.xpr(path).evaluate(node, XPathConstants.STRING);
+    if (value != null && !value.isEmpty()) {
+      action.f(value);
+    } else {
+      otherwiseAction.f();
+    }
   }
 
 }
