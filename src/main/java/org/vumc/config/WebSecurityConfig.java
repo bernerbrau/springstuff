@@ -8,7 +8,6 @@
 package org.vumc.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +18,6 @@ import org.springframework.security.config.annotation.authentication.configurers
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.core.userdetails.cache.SpringCacheBasedUserCache;
@@ -27,15 +25,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.vumc.jwt.JWTSecurityContextRepository;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.sql.DataSource;
+
 
 @Configuration
 @EnableWebSecurity
@@ -115,7 +111,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         if (!environment.acceptsProfiles("war")) {
-          registry.addMapping("/**");
+          //registry.addMapping("/**");
+          registry.addMapping("/api/**");
         }
       }
     };
@@ -141,6 +138,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     }
 
     this.userDetailsManager = jdbc.getUserDetailsService();
+
   }
 
   @Bean
