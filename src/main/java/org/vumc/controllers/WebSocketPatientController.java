@@ -7,6 +7,8 @@
  */
 package org.vumc.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -21,7 +23,7 @@ import javax.annotation.PreDestroy;
 @Controller
 public class WebSocketPatientController
 {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketPatientController.class);
   private Observable<Patient>   patientObservable;
   private SimpMessagingTemplate webSocketTemplate;
   private Subscription          subscription;
@@ -34,6 +36,9 @@ public class WebSocketPatientController
   {
     patientObservable = inPatientObservable;
     webSocketTemplate = inWebSocketTemplate;
+
+    LOGGER.debug("patientObservable: {}; webSocketTemplate: {}",inPatientObservable,inWebSocketTemplate);
+
   }
 
   @PostConstruct

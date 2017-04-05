@@ -76,12 +76,34 @@ repositories {
 
 dependencies {
     // Spring Boot frameworks
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    compile('org.springframework.boot:spring-boot-starter-data-rest')
-	compile('org.springframework.boot:spring-boot-starter-hateoas')
-	compile('org.springframework.boot:spring-boot-starter-websocket')
-    compile("org.springframework.boot:spring-boot-starter-security")
+    compile('org.springframework.boot:spring-boot-starter-logging') {
+        exclude module: 'logback-classic'
+        exclude module: 'log4j-over-slf4j'
+    }
+    compile('org.springframework.boot:spring-boot-starter-web') {
+        exclude module: 'logback-classic'
+        exclude module: 'log4j-over-slf4j'
+    }
+    compile('org.springframework.boot:spring-boot-starter-data-jpa') {
+        exclude module: 'logback-classic'
+        exclude module: 'log4j-over-slf4j'
+    }
+    compile('org.springframework.boot:spring-boot-starter-data-rest') {
+        exclude module: 'logback-classic'
+        exclude module: 'log4j-over-slf4j'
+    }
+	compile('org.springframework.boot:spring-boot-starter-hateoas'){
+        exclude module: 'logback-classic'
+        exclude module: 'log4j-over-slf4j'
+    }
+	compile('org.springframework.boot:spring-boot-starter-websocket'){
+        exclude module: 'logback-classic'
+        exclude module: 'log4j-over-slf4j'
+    }
+    compile("org.springframework.boot:spring-boot-starter-security"){
+        exclude module: 'logback-classic'
+        exclude module: 'log4j-over-slf4j'
+    }
 
     // Reactive Streams
 	compile('io.reactivex:rxjava:1.1.6')
@@ -112,12 +134,26 @@ dependencies {
 
     compile("com.auth0:java-jwt:3.1.0")
 
+    // Logging Dependencies
+    //compile("org.springframework.boot:spring-boot-starter-parent")
+    compile("org.slf4j:slf4j-api:1.7.25")
+    runtime("org.slf4j:slf4j-log4j12:1.7.25")
+    runtime("org.apache.logging.log4j:log4j-api:2.8.1")
+    runtime("org.apache.logging.log4j:log4j-core:2.8.1")
+    runtime("org.apache.logging.log4j:log4j-jcl:2.8.1") //required if you intend to route Spring Boot application.properties logging configuration to a Log4J 2 file appender
+
     // Dev-only dependencies. These MUST be excluded in the war {} config above.
-    runtime('org.springframework.boot:spring-boot-devtools')
+    runtime('org.springframework.boot:spring-boot-devtools'){
+        exclude module: 'logback-classic'
+        exclude module: 'log4j-over-slf4j'
+    }
     runtime("com.h2database:h2:1.4.194")
     runtime('com.oracle:ojdbc6:12.1.0.2')
 
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.boot:spring-boot-starter-test'){
+        exclude module: 'logback-classic'
+        exclude module: 'log4j-over-slf4j'
+    }
 }
 
 dependencyManagement {
