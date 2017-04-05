@@ -17,12 +17,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.vumc.model.UsernameAndPassword;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/login")
 public class LoginController
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
   private final AuthenticationManager authManager;
+
 
   @Autowired
   public LoginController(final AuthenticationManager inAuthManager)
@@ -39,5 +43,7 @@ public class LoginController
                 new UsernamePasswordAuthenticationToken(
                     credentials.username,
                     credentials.password)));
+
+    LOGGER.info("User {} logged in.",credentials.username);
   }
 }
