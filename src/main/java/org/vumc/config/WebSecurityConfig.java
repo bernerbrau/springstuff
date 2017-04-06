@@ -119,7 +119,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         if (!environment.acceptsProfiles("war")) {
-          //registry.addMapping("/**");
           registry.addMapping("/api/**");
         }
       }
@@ -142,7 +141,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
       jdbc.withDefaultSchema()
         .withUser("testuser")
           .password(passwordEncoder.encode("testpass"))
-        .authorities("provider","Patients.All.View");
+          .authorities("provider")
+        .and()
+        .withUser("vaadevmessaging.orionhealthcloud.com")
+          .password("")
+          .authorities("patientsource");
     }
 
     this.userDetailsManager = jdbc.getUserDetailsService();
