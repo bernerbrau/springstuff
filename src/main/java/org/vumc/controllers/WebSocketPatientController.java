@@ -24,25 +24,14 @@ import javax.annotation.PreDestroy;
 public class WebSocketPatientController
 {
   private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketPatientController.class);
-  private Observable<Patient>   patientObservable;
-  private SimpMessagingTemplate webSocketTemplate;
-  private Subscription          subscription;
+  private Subscription subscription;
 
   @Autowired
-  public WebSocketPatientController(
-        @Qualifier("patientObservable")
-        final Observable<Patient> inPatientObservable,
-        final SimpMessagingTemplate inWebSocketTemplate)
-  {
-    patientObservable = inPatientObservable;
-    webSocketTemplate = inWebSocketTemplate;
+  void subscribeToPatientFeed(@Qualifier("patientObservable")
+                              final Observable<Patient> patientObservable,
+                              final SimpMessagingTemplate webSocketTemplate) {
+    LOGGER.debug("patientObservable: {}; webSocketTemplate: {}",patientObservable,webSocketTemplate);
 
-    LOGGER.debug("patientObservable: {}; webSocketTemplate: {}",inPatientObservable,inWebSocketTemplate);
-
-  }
-
-  @PostConstruct
-  void subscribeToPatientFeed() {
     subscription = patientObservable.subscribe(
         patient ->
             webSocketTemplate.convertAndSend(

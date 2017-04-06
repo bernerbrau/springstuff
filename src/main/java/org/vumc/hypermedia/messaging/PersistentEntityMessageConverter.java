@@ -17,6 +17,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -51,6 +53,7 @@ public class PersistentEntityMessageConverter extends MappingJackson2MessageConv
   protected Object convertToInternal(final Object payload, final MessageHeaders headers,
                                      final Object conversionHint)
   {
+    /* FIXME this adds hypermedia links based on the CURRENT security context, which is not the same as the recipients' security context! */
     PersistentEntityResource resource =
         processors.invokeProcessorsFor(
             assembler.toFullResource(payload));
@@ -66,8 +69,15 @@ public class PersistentEntityMessageConverter extends MappingJackson2MessageConv
                 (entry) -> entry.getValue().get(0)))
     );
     headerValues.putAll(headers);
-    headerValues.put("Content-Type", APPLICATION_HAL_JSON_FULLTYPE);
+    headerValues.put(MessageHeaders.CONTENT_TYPE, APPLICATION_HAL_JSON_FULLTYPE);
+
     MessageHeaders newHeaders = new MessageHeaders(headerValues);
+
+    MessageHeaderAccessor
+        accessor = MessageHeaderAccessor.getAccessor(headers, MessageHeaderAccessor.class);
+    if (accessor != null && accessor.isMutable()) {
+      accessor.copyHeadersIfAbsent(newHeaders);
+    }
 
     return super.convertToInternal(resource, newHeaders, conversionHint);
   }

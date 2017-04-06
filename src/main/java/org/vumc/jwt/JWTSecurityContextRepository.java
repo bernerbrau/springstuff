@@ -7,16 +7,9 @@
  */
 package org.vumc.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
@@ -25,26 +18,21 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.Date;
-import java.util.UUID;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import static org.vumc.jwt.JWTConstants.bearerPattern;
 
 @Component
 public class JWTSecurityContextRepository implements SecurityContextRepository
 {
-  private static final Pattern bearerPattern = Pattern.compile("^Bearer\\s+(.+)$");
-
-  private final byte[] jwtSecret;
+  private final JWTSigner signer;
+  private final JWTVerifier verifier;
 
   @Autowired
-  public JWTSecurityContextRepository(@Qualifier("jwtSecret") byte[] jwtSecret) {
-    this.jwtSecret = jwtSecret;
+  public JWTSecurityContextRepository(final JWTSigner inSigner, final JWTVerifier inVerifier)
+  {
+    signer = inSigner;
+    verifier = inVerifier;
   }
 
   @Override
@@ -57,9 +45,8 @@ public class JWTSecurityContextRepository implements SecurityContextRepository
     String jwtToken = obtainToken(requestResponseHolder.getRequest());
     if (jwtToken != null) {
       context.setAuthentication(
-          JWTAuthenticationToken.fromTrustedJWT(
-              verify(
-                  jwtToken)));
+          verifier.verify(
+                  jwtToken));
       requestResponseHolder.getResponse().setHeader("X-Auth-Token", jwtToken);
     }
     return context;
@@ -75,7 +62,7 @@ public class JWTSecurityContextRepository implements SecurityContextRepository
         && !(authentication instanceof AnonymousAuthenticationToken)
         && !(authentication instanceof JWTAuthenticationToken))
     {
-      response.setHeader("X-Auth-Token", newToken(authentication));
+      response.setHeader("X-Auth-Token", signer.sign(authentication));
     }
   }
 
@@ -100,37 +87,5 @@ public class JWTSecurityContextRepository implements SecurityContextRepository
     }
   }
 
-  private String newToken(Authentication auth) {
-    if (!auth.isAuthenticated())
-    {
-      throw new JWTCreationException("Could not create JWT Token",
-            new IllegalArgumentException("Unauthorized username and password"));
-    }
 
-    ZonedDateTime now = ZonedDateTime.now();
-    Instant expiry = now.plus(10, ChronoUnit.YEARS).toInstant();
-
-    Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-
-    String[] authorityNames = authorities.stream()
-                                  .map(GrantedAuthority::getAuthority)
-                                  .collect(Collectors.toList())
-                                  .toArray(new String[0]);
-
-    return JWT.create()
-               .withJWTId(UUID.randomUUID().toString())
-               .withIssuedAt(Date.from(now.toInstant()))
-               .withExpiresAt(Date.from(expiry))
-               .withSubject(auth.getName())
-               .withArrayClaim("auth", authorityNames)
-               .sign(Algorithm.HMAC512(jwtSecret));
-  }
-
-  private DecodedJWT verify(String jwtToken) throws JWTVerificationException
-  {
-    return JWT.require(Algorithm.HMAC512(jwtSecret))
-               .acceptExpiresAt(Instant.now().getEpochSecond())
-               .build()
-               .verify(jwtToken);
-  }
 }

@@ -12,9 +12,11 @@ import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.provisioning.JdbcUserDetailsManagerConfigurer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -34,6 +36,7 @@ import javax.sql.DataSource;
 
 
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 {
@@ -64,7 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
     http.authorizeRequests()
-        .requestMatchers(r -> "OPTIONS".equals(r.getMethod())).permitAll()
+        .antMatchers(HttpMethod.OPTIONS).permitAll()
         .antMatchers(
             // Angular2 compiled files
             "/index.html",
@@ -77,7 +80,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             // Public portions of the API
             "/api",
             "/api/login",
-            "/api/patients/c32",
             "/api/profile",
             "/api/profile/**",
 
@@ -88,21 +90,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             "/public/**",
             "favicon.ico",
 
-            // TODO secure the STOMP endpoint
+//      TODO x509 client authentication
+            "/api/patients/c32",
+
+            // Websockets are authenticated within the STOMP protocol
             "/stomp/**"
         ).permitAll()
-//      TODO x509 client authentication
-//        .antMatchers(HttpMethod.POST, "/api/patients/c32").hasAnyAuthority("patientSource","*")
-        .anyRequest().hasAnyAuthority("provider","*");
+        .anyRequest().authenticated();
 
+    http.x509().subjectPrincipalRegex("CN=(.*?),");
     http.anonymous().authorities("anon");
 
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     http.securityContext().securityContextRepository(jwtRepo);
 
     http.exceptionHandling().authenticationEntryPoint((req, res, e) ->
-      res.setStatus(HttpStatus.UNAUTHORIZED.value())
-    );
+    {
+      if (req.getServletPath().startsWith("/api"))
+      {
+        res.setStatus(HttpStatus.UNAUTHORIZED.value());
+      }
+    });
   }
 
   @Bean
@@ -134,7 +142,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
       jdbc.withDefaultSchema()
         .withUser("testuser")
           .password(passwordEncoder.encode("testpass"))
-        .authorities("provider");
+        .authorities("provider","Patients.All.View");
     }
 
     this.userDetailsManager = jdbc.getUserDetailsService();
