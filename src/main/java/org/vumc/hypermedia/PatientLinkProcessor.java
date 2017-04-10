@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 import org.vumc.controllers.PatientResourceController;
 import org.vumc.model.Patient;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Component
 public class PatientLinkProcessor implements ResourceProcessor<Resource<Patient>>

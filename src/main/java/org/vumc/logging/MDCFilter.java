@@ -14,20 +14,15 @@ https://logback.qos.ch/xref/chapters/mdc/UserServletFilter.html
 https://logback.qos.ch/xref/ch/qos/logback/classic/helpers/MDCInsertingServletFilter.html
  */
 
+import org.slf4j.MDC;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.Principal;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 //import javax.servlet.http.HttpSession;
-
-import org.slf4j.MDC;
-import org.springframework.stereotype.Component;
 
 @Component
 public class MDCFilter implements Filter {

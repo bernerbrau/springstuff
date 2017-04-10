@@ -1,11 +1,15 @@
-THESE ARE NOT SECURE CERTIFICATES. DO NOT USE THEM IN PRODUCTION. THEY ARE FOR TESTING ONLY.
-THESE ARE NOT SECURE CERTIFICATES. DO NOT USE THEM IN PRODUCTION. THEY ARE FOR TESTING ONLY.
-THESE ARE NOT SECURE CERTIFICATES. DO NOT USE THEM IN PRODUCTION. THEY ARE FOR TESTING ONLY.
-THESE ARE NOT SECURE CERTIFICATES. DO NOT USE THEM IN PRODUCTION. THEY ARE FOR TESTING ONLY.
-THESE ARE NOT SECURE CERTIFICATES. DO NOT USE THEM IN PRODUCTION. THEY ARE FOR TESTING ONLY.
-THESE ARE NOT SECURE CERTIFICATES. DO NOT USE THEM IN PRODUCTION. THEY ARE FOR TESTING ONLY.
-THESE ARE NOT SECURE CERTIFICATES. DO NOT USE THEM IN PRODUCTION. THEY ARE FOR TESTING ONLY.
-THESE ARE NOT SECURE CERTIFICATES. DO NOT USE THEM IN PRODUCTION. THEY ARE FOR TESTING ONLY.
+THESE ARE NOT SECURE CERTIFICATES.
+                                   DO NOT USE THEM IN PRODUCTION.
+                                                                  THEY ARE FOR TESTING ONLY.
+THESE ARE NOT SECURE CERTIFICATES.
+                                   DO NOT USE THEM IN PRODUCTION.
+                                                                  THEY ARE FOR TESTING ONLY.
+THESE ARE NOT SECURE CERTIFICATES.
+                                   DO NOT USE THEM IN PRODUCTION.
+                                                                  THEY ARE FOR TESTING ONLY.
+THESE ARE NOT SECURE CERTIFICATES.
+                                   DO NOT USE THEM IN PRODUCTION.
+                                                                  THEY ARE FOR TESTING ONLY.
 
 Files in this directory:
 
@@ -18,3 +22,5 @@ Spring Boot is configured to use/trust the certificates in this directory when r
 You will need these files to test HTTPS requests using Postman or other REST client. The CN for cert.pem is
 vaadevmessaging.orionhealthcloud.com. A user with this name will need to be set up in the JDBC store to perform mutual
 authentication (one is already set up in the in-memory database configuration).
+
+The passcode for all keystores and keys is: abc123

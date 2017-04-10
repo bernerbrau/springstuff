@@ -91,9 +91,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             "/public/**",
             "favicon.ico",
 
-//      TODO x509 client authentication
-            "/api/patients/c32",
-
             // Websockets are authenticated within the STOMP protocol
             "/stomp/**"
         ).permitAll()

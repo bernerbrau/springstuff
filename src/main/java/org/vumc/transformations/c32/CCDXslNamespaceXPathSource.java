@@ -7,7 +7,6 @@
  */
 package org.vumc.transformations.c32;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.xml.SimpleNamespaceContext;
 import org.vumc.transformations.xml.XPathSource;

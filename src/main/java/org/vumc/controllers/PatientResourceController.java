@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.vumc.model.Patient;
 import org.vumc.repository.PatientRepository;
@@ -39,6 +40,7 @@ public class PatientResourceController
     this.patientRepository = patientRepository;
   }
 
+  @PreAuthorize("hasAuthority('patientsource')")
   @RequestMapping(path = "c32", method = RequestMethod.POST,
                   consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_XML_VALUE })
   public void postC32Document(@RequestBody String inCdaRequest)
@@ -47,6 +49,8 @@ public class PatientResourceController
     patientXMLObserver.onNext(inCdaRequest);
   }
 
+
+  @PreAuthorize("hasAuthority('provider')")
   @RequestMapping(path = "{id}/body.html", method = RequestMethod.GET,
                   produces = MediaType.TEXT_HTML_VALUE)
   public ResponseEntity<String> getHtml(@PathVariable("id") long id) {

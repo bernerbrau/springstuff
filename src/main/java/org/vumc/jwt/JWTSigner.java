@@ -10,13 +10,11 @@ package org.vumc.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -26,16 +24,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
-public class JWTSigner
+class JWTSigner extends JWTKeyUser
 {
-  private final byte[] jwtSecret;
-
-  @Autowired
-  public JWTSigner(@Qualifier("jwtSecret") byte[] jwtSecret) {
-    this.jwtSecret = jwtSecret;
-  }
-
-  String sign(Authentication auth) {
+  String sign(Authentication auth) throws JWTCreationException {
     if (!auth.isAuthenticated())
     {
       throw new JWTCreationException("Could not create JWT Token",
@@ -52,12 +43,19 @@ public class JWTSigner
                                   .collect(Collectors.toList())
                                   .toArray(new String[0]);
 
-    return JWT.create()
-               .withJWTId(UUID.randomUUID().toString())
-               .withIssuedAt(Date.from(now.toInstant()))
-               .withExpiresAt(Date.from(expiry))
-               .withSubject(auth.getName())
-               .withArrayClaim("auth", authorityNames)
-               .sign(Algorithm.HMAC512(jwtSecret));
+    try
+    {
+      return JWT.create()
+                 .withJWTId(UUID.randomUUID().toString())
+                 .withIssuedAt(Date.from(now.toInstant()))
+                 .withExpiresAt(Date.from(expiry))
+                 .withSubject(auth.getName())
+                 .withArrayClaim("auth", authorityNames)
+                 .sign(Algorithm.HMAC512(jwtSecret.f()));
+    }
+    catch (GeneralSecurityException inE)
+    {
+      throw new JWTCreationException("JWT Secret Exception", inE);
+    }
   }
 }

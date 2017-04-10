@@ -17,7 +17,6 @@ import org.vumc.model.Patient;
 import rx.Observable;
 import rx.Subscription;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 @Controller

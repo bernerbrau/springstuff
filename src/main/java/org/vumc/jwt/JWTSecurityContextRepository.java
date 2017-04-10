@@ -44,9 +44,7 @@ public class JWTSecurityContextRepository implements SecurityContextRepository
     }
     String jwtToken = obtainToken(requestResponseHolder.getRequest());
     if (jwtToken != null) {
-      context.setAuthentication(
-          verifier.verify(
-                  jwtToken));
+      context.setAuthentication(verifier.verify(jwtToken));
       requestResponseHolder.getResponse().setHeader("X-Auth-Token", jwtToken);
     }
     return context;
