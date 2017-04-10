@@ -8,6 +8,7 @@
 package org.vumc.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import org.springframework.data.annotation.CreatedDate;

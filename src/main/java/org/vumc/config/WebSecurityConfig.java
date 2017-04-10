@@ -25,12 +25,11 @@ import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.core.userdetails.cache.SpringCacheBasedUserCache;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.vumc.jwt.JWTSecurityContextRepository;
+import org.vumc.users.JdbcUserDetailsManagerExt;
 
 import javax.sql.DataSource;
 
@@ -42,14 +41,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 {
   private final Environment                       environment;
   private final JWTSecurityContextRepository      jwtRepo;
-  private       JdbcUserDetailsManager            userDetailsManager;
+  private final JdbcUserDetailsManagerExt         userDetailsManager;
 
   @Autowired
   public WebSecurityConfig(final Environment inEnvironment,
-                           final JWTSecurityContextRepository jwtRepo)
+                           final JWTSecurityContextRepository jwtRepo,
+                           final JdbcUserDetailsManagerExt userDetailsManagerExt)
   {
     environment = inEnvironment;
     this.jwtRepo = jwtRepo;
+    this.userDetailsManager = userDetailsManagerExt;
   }
 
   @Override
@@ -132,7 +133,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
                               UserCache userCache) throws Exception
   {
     JdbcUserDetailsManagerConfigurer<AuthenticationManagerBuilder>
-        jdbc = auth.jdbcAuthentication()
+        jdbc = auth.apply(new JdbcUserDetailsManagerConfigurer<>(userDetailsManager))
                    .dataSource(dataSource)
                    .passwordEncoder(passwordEncoder)
                    .userCache(userCache);
@@ -140,25 +141,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     if (environment.acceptsProfiles("local")) {
       jdbc.withDefaultSchema()
         .withUser("testuser")
-          .password(passwordEncoder.encode("testpass"))
+        .password(passwordEncoder.encode("testpass"))
           .authorities("provider")
         .and()
         .withUser("vaadevmessaging.orionhealthcloud.com")
           .password("")
           .authorities("patientsource");
     }
-
-    this.userDetailsManager = jdbc.getUserDetailsService();
-
   }
 
   @Bean
-  public UserDetailsManager userDetailsManager()
-  {
-    return userDetailsManager;
-	}
-
-	@Bean
   public UserCache userCache() throws Exception
   {
     return new SpringCacheBasedUserCache(new ConcurrentMapCache("users"));
