@@ -130,7 +130,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
                               UserCache userCache) throws Exception
   {
     JdbcUserDetailsManagerConfigurer<AuthenticationManagerBuilder>
-        jdbc = auth.apply(new JdbcUserDetailsManagerConfigurer<>(userDetailsManager))
+        jdbc = auth.userDetailsService(userDetailsManager)
+                   .and()
+                   .apply(new JdbcUserDetailsManagerConfigurer<>(userDetailsManager))
                    .dataSource(dataSource)
                    .passwordEncoder(passwordEncoder)
                    .userCache(userCache);

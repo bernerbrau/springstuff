@@ -14,15 +14,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.vumc.model.Patient;
 
 @RepositoryRestResource
-@PreAuthorize("hasAuthority('provider')")
+@PreAuthorize("denyAll()")
 public interface PatientRepository extends CrudRepository<Patient, Long>
 {
   @Override
   @RestResource(exported=false)
+  @PreAuthorize("hasAuthority('patientsource')")
   <S extends Patient> S save(S entity);
 
   @Override
   @RestResource(exported=false)
+  @PreAuthorize("hasAuthority('patientsource')")
   <S extends Patient> Iterable<S> save(Iterable<S> entities);
 
   @Override
