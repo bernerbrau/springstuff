@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.ErrorPageFilter;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.web.WebApplicationInitializer;
@@ -14,6 +15,7 @@ import org.vumc.weblogic.WeblogicAnnotationConfigEmbeddedWebApplicationContext;
 @SpringBootApplication
 @EnableEntityLinks
 @EnableJpaAuditing
+@PropertySource(value = "classpath:continuum.system.properties", ignoreResourceNotFound = true)
 public class ContinuumApplication
     extends SpringBootServletInitializer
     implements WebApplicationInitializer
