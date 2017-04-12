@@ -81,6 +81,12 @@ repositories {
     }
 }
 
+processResources {
+    filesMatching('application-war.properties') {
+        expand(project.properties)
+    }
+}
+
 dependencies {
     // Spring Boot frameworks
     compile('org.springframework.boot:spring-boot-starter-logging') {

@@ -10,6 +10,7 @@ package org.vumc.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.broker.AbstractBrokerMessageHandler;
 import org.springframework.messaging.simp.broker.SimpleBrokerMessageHandler;
@@ -27,12 +28,15 @@ import java.util.List;
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 {
   private final PersistentEntityMessageConverter hypermediaConverter;
+  private final Environment environment;
 
   @Autowired
   public WebSocketConfig(
-      final PersistentEntityMessageConverter inHypermediaConverter)
+      final PersistentEntityMessageConverter inHypermediaConverter,
+      final Environment inEnvironment)
   {
     hypermediaConverter = inHypermediaConverter;
+    environment = inEnvironment;
   }
 
   @Override
