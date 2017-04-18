@@ -25,13 +25,12 @@ import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.core.userdetails.cache.SpringCacheBasedUserCache;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.preauth.x509.X509AuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.vumc.jwt.JWTSecurityContextRepository;
-import org.vumc.proxy.ProxyPreAuthConfigurer;
-import org.vumc.proxy.ProxyPreAuthenticationFilter;
+import org.vumc.proxy.ProxyEnabledX509AuthenticationFilter;
+import org.vumc.proxy.ProxyEnabledX509Configurer;
 import org.vumc.users.JdbcUserDetailsManagerExt;
 
 import javax.sql.DataSource;
@@ -99,8 +98,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         ).permitAll()
         .anyRequest().authenticated();
 
-    http.x509().subjectPrincipalRegex("CN=(.*?),");
-    http.apply(new ProxyPreAuthConfigurer<>());
+    http.apply(new ProxyEnabledX509Configurer<>())
+        .subjectDNProxyHeader("X-SSL-Client-Cert-Subject")
+        .subjectPrincipalRegex("CN=(.*?),")
+        .brokerAuthority("authenticationbroker");
+
     http.anonymous().authorities("anon");
 
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -148,9 +150,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         .password(passwordEncoder.encode("testpass"))
           .authorities("provider")
         .and()
-        .withUser("somebodyfixme") // TODO replace with the name of the LTM CN
+        .withUser("continuumdev")
           .password("")
-          .authorities("userverifier")
+          .authorities("authenticationbroker")
         .and()
         .withUser("vaadevmessaging.orionhealthcloud.com")
           .password("")
