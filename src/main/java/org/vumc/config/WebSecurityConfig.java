@@ -93,6 +93,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             "/public/**",
             "favicon.ico",
 
+            "/api/patients/c32",
+
             // Websockets are authenticated within the STOMP protocol
             "/stomp/**"
         ).permitAll()
@@ -148,7 +150,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
       jdbc.withDefaultSchema()
         .withUser("testuser")
         .password(passwordEncoder.encode("testpass"))
-          .authorities("provider")
+          .authorities("provider","patientsource")
         .and()
         .withUser("continuumdev")
           .password("")

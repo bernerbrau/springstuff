@@ -13,6 +13,9 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.vumc.model.Patient;
 
+import java.util.Collection;
+import java.util.List;
+
 @RepositoryRestResource
 @PreAuthorize("denyAll()")
 public interface PatientRepository extends CrudRepository<Patient, Long>
@@ -24,24 +27,24 @@ public interface PatientRepository extends CrudRepository<Patient, Long>
 
   @Override
   @RestResource(exported=false)
-  @PreAuthorize("hasAuthority('patientsource')")
-  <S extends Patient> Iterable<S> save(Iterable<S> entities);
+  @PreAuthorize("hasAuthority('provider')")
+  Patient findOne(Long inLong);
+
+  @Override
+  @PreAuthorize("hasAnyAuthority('provider','system')")
+  Collection<Patient> findAll();
 
   @Override
   @RestResource(exported=false)
-  Patient findOne(Long inLong);
+  <S extends Patient> List<S> save(Iterable<S> entities);
 
   @Override
   @RestResource(exported=false)
   boolean exists(Long inLong);
 
   @Override
-  @PreAuthorize("hasAuthority('provider')")
-  Iterable<Patient> findAll();
-
-  @Override
   @RestResource(exported=false)
-  Iterable<Patient> findAll(Iterable<Long> ids);
+  Collection<Patient> findAll(Iterable<Long> ids);
 
   @Override
   @RestResource(exported=false)
@@ -62,4 +65,5 @@ public interface PatientRepository extends CrudRepository<Patient, Long>
   @Override
   @RestResource(exported=false)
   void deleteAll();
+
 }

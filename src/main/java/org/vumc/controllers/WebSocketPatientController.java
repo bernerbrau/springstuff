@@ -10,36 +10,27 @@ package org.vumc.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.vumc.model.Patient;
-import rx.Observable;
-import rx.Subscription;
-
-import javax.annotation.PreDestroy;
 
 @Controller
 public class WebSocketPatientController
 {
   private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketPatientController.class);
-  private Subscription subscription;
+  private final SimpMessagingTemplate webSocketTemplate;
 
   @Autowired
-  void subscribeToPatientFeed(@Qualifier("patientObservable")
-                              final Observable<Patient> patientObservable,
-                              final SimpMessagingTemplate webSocketTemplate) {
-    LOGGER.debug("patientObservable: {}; webSocketTemplate: {}",patientObservable,webSocketTemplate);
-
-    subscription = patientObservable.subscribe(
-        patient ->
-            webSocketTemplate.convertAndSend(
-                "/topic/patients", patient));
+  public WebSocketPatientController(final SimpMessagingTemplate inWebSocketTemplate)
+  {
+    webSocketTemplate = inWebSocketTemplate;
   }
 
-  @PreDestroy
-  void unsubscribe() {
-    subscription.unsubscribe();
+  @ServiceActivator(inputChannel = "newPatients")
+  public void broadcastNewPatient(Message<Patient> patient) {
+    webSocketTemplate.send("/topic/patients", patient);
   }
 
 }

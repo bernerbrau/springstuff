@@ -25,6 +25,7 @@ apply plugin: 'io.spring.dependency-management'
 dependencyManagement {
     imports {
         mavenBom 'org.apache.logging.log4j:log4j-bom:2.8.1'
+        mavenBom "org.springframework.integration:spring-integration-bom:4.3.6.RELEASE"
     }
 }
 
@@ -117,9 +118,13 @@ dependencies {
         exclude module: 'logback-classic'
         exclude module: 'log4j-over-slf4j'
     }
+    compile("org.springframework.boot:spring-boot-starter-integration"){
+        exclude module: 'logback-classic'
+        exclude module: 'log4j-over-slf4j'
+    }
 
-    // Reactive Streams
-	compile('io.reactivex:rxjava:1.1.6')
+    compile("org.springframework.integration:spring-integration-jdbc");
+    compile("org.springframework.integration:spring-integration-jpa");
 
     // HL7
     compile 'ca.uhn.hapi:hapi-base:2.2'
@@ -170,9 +175,3 @@ dependencies {
 }
 
 compileJava.dependsOn(processResources)
-
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Camden.SR5"
-	}
-}

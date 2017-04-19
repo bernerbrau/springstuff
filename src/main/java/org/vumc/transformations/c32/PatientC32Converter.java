@@ -7,6 +7,7 @@
  */
 package org.vumc.transformations.c32;
 
+import com.google.common.base.Charsets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vumc.model.Patient;
@@ -18,6 +19,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -38,6 +40,16 @@ public class PatientC32Converter
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setNamespaceAware(true);
     docBuilder = factory.newDocumentBuilder();
+  }
+
+  public Patient convert(String xmlAsString) {
+    try (InputStream xmlAsStream = new ByteArrayInputStream(xmlAsString.getBytes(Charsets.UTF_8)))
+    {
+      return convert(xmlAsStream);
+    }
+    catch (IOException e) {
+      throw new InvalidTransformationResultException("Error parsing C32 document: " + e.getMessage());
+    }
   }
 
   public Patient convert(InputStream xmlAsStream) {
