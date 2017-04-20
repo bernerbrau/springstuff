@@ -27,7 +27,7 @@ public interface PatientRepository extends CrudRepository<Patient, Long>
 
   @Override
   @RestResource(exported=false)
-  @PreAuthorize("hasAuthority('provider')")
+  @PreAuthorize("hasAnyAuthority('provider','system')")
   Patient findOne(Long inLong);
 
   @Override

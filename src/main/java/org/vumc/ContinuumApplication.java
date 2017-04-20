@@ -8,6 +8,8 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.hateoas.config.EnableEntityLinks;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.WebApplicationContext;
 import org.vumc.weblogic.WeblogicAnnotationConfigEmbeddedWebApplicationContext;
@@ -15,6 +17,8 @@ import org.vumc.weblogic.WeblogicAnnotationConfigEmbeddedWebApplicationContext;
 @SpringBootApplication
 @EnableEntityLinks
 @EnableJpaAuditing
+@EnableTransactionManagement
+@EnableScheduling
 @PropertySource(value = "classpath:continuum.system.properties", ignoreResourceNotFound = true)
 public class ContinuumApplication
     extends SpringBootServletInitializer

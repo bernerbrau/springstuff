@@ -10,8 +10,11 @@ package org.vumc.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.vumc.model.Patient;
@@ -29,14 +32,18 @@ public class PatientResourceController
 
   private final PatientC32Converter patientC32Converter;
   private final PatientRepository patientRepository;
+  private final MessageChannel newPatients;
 
   @Autowired
   public PatientResourceController(
       PatientC32Converter patientC32Converter,
-      PatientRepository patientRepository)
+      PatientRepository patientRepository,
+      @Qualifier("newPatients")
+      final MessageChannel inNewPatients)
   {
     this.patientC32Converter = patientC32Converter;
     this.patientRepository = patientRepository;
+    this.newPatients = inNewPatients;
   }
 
   @PreAuthorize("hasAuthority('patientsource')")
@@ -45,7 +52,15 @@ public class PatientResourceController
   public void postC32Document(@RequestBody String inC32Request)
       throws TransformerException, IOException
   {
-    patientRepository.save(patientC32Converter.convert(inC32Request));
+    newPatients.send(
+        new GenericMessage<>(
+            patientRepository.save(
+                patientC32Converter.convert(
+                    inC32Request
+                )
+            )
+        )
+    );
   }
 
   @PreAuthorize("hasAuthority('provider')")

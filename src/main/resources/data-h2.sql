@@ -1,3 +1,7 @@
+create table message (id char(36) not null, headers clob not null, payload_class char(100) not null, payload clob not null, timestamp timestamp not null default CURRENT_TIMESTAMP, primary key (id));
+create table message_receipt (server_node_identifier varchar(25) not null, message_id char(36) not null, primary key (message_id, server_node_identifier));
+alter table message_receipt add constraint fk_message_receipt_message foreign key (message_id) references message;
+
 -- noinspection SqlNoDataSourceInspectionForFiles
 INSERT INTO PATIENT (ID, BODY, DOB, GENDER, FAMILY, GIVEN, SUFFIX, PATIENT_ID) VALUES (nextval('PATIENT_SEQ'), '<html><head><link href="https://www.orionhealth.com/software/ccd/style/skin_v2.4.css" rel="stylesheet" type="text/css"></link><title>Continuity of Care Document</title></head><body><h2 align="center">Continuity of Care Document</h2><p align="center"><b>Created On: </b>March 13, 2017</p><hr></hr><div class="header"><div class="demographics sticky"><div class="bl"><div class="br"><div class="tr"><div class="person-name">HOOT, SCOOT </div><div class="sex-age"><span id="calculatedAge"></span></div><div class="id">AACJ-4531-1<span class="label">
  (ORION)
@@ -112,3 +116,4 @@ INSERT INTO PATIENT (ID, BODY, DOB, GENDER, FAMILY, GIVEN, SUFFIX, PATIENT_ID) V
  }
  document.getElementById(''calculatedAge'').innerHTML = ageWithSeparator;
  </script></html>', null, null, 'HOOT', 'SCOOT', null, 'AACJ-4531-1');
+

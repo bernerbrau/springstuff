@@ -27,7 +27,7 @@ public class RequestStoringHandshakeInterceptor implements HandshakeInterceptor
                                  final Map<String, Object> attributes)
       throws Exception
   {
-    request.getAsyncRequestControl(response).start();
+    request.getAsyncRequestControl(response).start(-1);
     attributes.put(ORIGINAL_REQUEST_ATTRIBUTE, new ServletWebRequest(((ServletServerHttpRequest)request).getServletRequest()));
     return true;
   }
@@ -36,6 +36,5 @@ public class RequestStoringHandshakeInterceptor implements HandshakeInterceptor
   public void afterHandshake(final ServerHttpRequest request, final ServerHttpResponse response,
                              final WebSocketHandler wsHandler, final Exception exception)
   {
-
   }
 }
