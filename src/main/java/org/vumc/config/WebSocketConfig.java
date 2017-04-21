@@ -78,8 +78,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
   {
     registry.addEndpoint("/stomp")
         .setAllowedOrigins("*")
-        .addInterceptors(new RequestStoringHandshakeInterceptor())
         .withSockJS()
+          .setInterceptors(new RequestStoringHandshakeInterceptor())
           .setSessionCookieNeeded(false);
   }
 

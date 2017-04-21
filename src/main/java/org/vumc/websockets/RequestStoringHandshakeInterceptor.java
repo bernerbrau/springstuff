@@ -14,6 +14,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 public class RequestStoringHandshakeInterceptor implements HandshakeInterceptor
@@ -27,9 +28,15 @@ public class RequestStoringHandshakeInterceptor implements HandshakeInterceptor
                                  final Map<String, Object> attributes)
       throws Exception
   {
-    request.getAsyncRequestControl(response).start(-1);
-    attributes.put(ORIGINAL_REQUEST_ATTRIBUTE, new ServletWebRequest(((ServletServerHttpRequest)request).getServletRequest()));
+    attributes.put(ORIGINAL_REQUEST_ATTRIBUTE,
+        new ServletWebRequest(
+            createStub(((ServletServerHttpRequest)request).getServletRequest())));
     return true;
+  }
+
+  private HttpServletRequest createStub(final HttpServletRequest inServletRequest)
+  {
+    return new HttpServletRequestStubWithPathInfo(inServletRequest);
   }
 
   @Override
