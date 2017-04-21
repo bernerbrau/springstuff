@@ -8,6 +8,8 @@
         <wls:prefer-application-packages>
             <wls:package-name>org.slf4j</wls:package-name>
             <wls:package-name>org.slf4j.impl</wls:package-name>
+            <wls:package-name>com.google.common</wls:package-name>
+            <wls:package-name>com.google.common.collect</wls:package-name>
             <wls:package-name>javassist</wls:package-name>
         </wls:prefer-application-packages>
     </wls:container-descriptor>
