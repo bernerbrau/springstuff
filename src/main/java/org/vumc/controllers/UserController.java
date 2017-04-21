@@ -35,6 +35,7 @@ public class UserController {
 
     @GetMapping
     public List<? extends UserDetails> getUsers() throws Exception {
+        LOGGER.info("Getting list of all users.");
         return userDetailsManager.findAllUsers().stream()
                 .map(this::erasePassword)
                 .collect(Collectors.toList());
@@ -42,6 +43,7 @@ public class UserController {
 
     @GetMapping("{username}")
     public UserDetails getUser(@PathVariable("username") String username) throws Exception {
+        LOGGER.info("Getting user {}", username);
         UserDetails userDetails = userDetailsManager.loadUserByUsername(username);
         return this.erasePassword(userDetails);
     }

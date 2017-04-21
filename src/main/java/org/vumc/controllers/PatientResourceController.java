@@ -52,6 +52,7 @@ public class PatientResourceController
   public void postC32Document(@RequestBody String inC32Request)
       throws TransformerException, IOException
   {
+    LOGGER.info("Received new c32");
     newPatients.send(
         new GenericMessage<>(
             patientRepository.save(
@@ -73,9 +74,11 @@ public class PatientResourceController
       String body = patient.body;
       if (body != null)
       {
+        LOGGER.info("Presented patient with id {} to user.", id);
         return ResponseEntity.ok(body);
       }
     }
+    LOGGER.info("Patient with id {} not found.", id);
     return ResponseEntity.notFound().build();
   }
 
