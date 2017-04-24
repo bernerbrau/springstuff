@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Component;
-import org.vumc.model.Authority;
+import org.vumc.model.DefinedAuthority;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class JdbcUserDetailsManagerExt extends JdbcUserDetailsManager implements
                     String password = rs.getString(2);
                     boolean enabled = rs.getBoolean(3);
                     return new User(username, password, enabled, true, true, true,
-                            Authority.from(loadUserAuthorities(username)));
+                            DefinedAuthority.from(loadUserAuthorities(username)));
                 });
     }
 

@@ -29,8 +29,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.vumc.jwt.JWTSecurityContextRepository;
-import org.vumc.proxy.ProxyEnabledX509AuthenticationFilter;
 import org.vumc.proxy.ProxyEnabledX509Configurer;
+import org.vumc.model.DefinedAuthority;
 import org.vumc.users.JdbcUserDetailsManagerExt;
 
 import javax.sql.DataSource;
@@ -66,9 +66,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
       http.headers().frameOptions().disable();
     }
 
-    http.sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
     http.authorizeRequests()
         .antMatchers(HttpMethod.OPTIONS).permitAll()
         .antMatchers(
@@ -92,8 +89,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             "**/*.js",
             "/public/**",
             "favicon.ico",
-
-            "/api/patients/c32",
 
             // Websockets are authenticated within the STOMP protocol
             "/stomp/**"
@@ -149,16 +144,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     if (environment.acceptsProfiles("local")) {
       jdbc.withDefaultSchema()
         .withUser("testuser")
-        .password(passwordEncoder.encode("testpass"))
-          .authorities("provider","patientsource")
+          .password(passwordEncoder.encode("testpass"))
+          .authorities(DefinedAuthority.PROVIDER.getAuthority())
         .and()
+        .withUser("testadmin")
+          .password(passwordEncoder.encode("testpass"))
+          .authorities(DefinedAuthority.USER_ADMIN.getAuthority())
+          .and()
         .withUser("continuumdev")
           .password("")
-          .authorities("authenticationbroker")
+          .authorities(DefinedAuthority.AUTHENTICATION_BROKER.getAuthority())
         .and()
         .withUser("vaadevmessaging.orionhealthcloud.com")
           .password("")
-          .authorities("patientsource");
+          .authorities(DefinedAuthority.PATIENT_SOURCE.getAuthority());
     }
   }
 

@@ -1,15 +1,16 @@
 package org.vumc.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 @JsonInclude(NON_NULL)
 public class User implements UserDetails {
 
-    private Collection<Authority> authorities;
+    private Collection<DefinedAuthority> authorities;
     private String password;
     private String username;
     private boolean isAccountNonExpired;
@@ -17,7 +18,7 @@ public class User implements UserDetails {
     private boolean isCredentialsNonExpired;
     private boolean isEnabled;
 
-    public void setAuthorities(Collection<Authority> authorities) {
+    public void setAuthorities(Collection<DefinedAuthority> authorities) {
         this.authorities = authorities;
     }
 
@@ -46,7 +47,7 @@ public class User implements UserDetails {
     }
 
     @Override
-    public Collection<Authority> getAuthorities() {
+    public Collection<DefinedAuthority> getAuthorities() {
         return authorities;
     }
 
@@ -86,7 +87,7 @@ public class User implements UserDetails {
         if (copyPassword) {
             user.setPassword(userDetails.getPassword());
         }
-        user.setAuthorities(Authority.from(userDetails.getAuthorities()));
+        user.setAuthorities(DefinedAuthority.from(userDetails.getAuthorities()));
         user.setEnabled(userDetails.isEnabled());
         user.setAccountNonExpired(userDetails.isAccountNonExpired());
         user.setAccountNonLocked(userDetails.isAccountNonLocked());

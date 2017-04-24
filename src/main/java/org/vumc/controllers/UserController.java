@@ -5,12 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.web.bind.annotation.*;
-import org.vumc.model.Authority;
+import org.vumc.model.DefinedAuthority;
 import org.vumc.model.User;
 import org.vumc.users.UserDetailsManagerExt;
 
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@PreAuthorize("hasAuthority('useradmin')")
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -101,7 +101,7 @@ public class UserController {
 
         //--- Determine if Authorities need to be updated ---
         if(user.getAuthorities() == null || user.getAuthorities().isEmpty()){
-            user.setAuthorities(Authority.from(currentUser.getAuthorities()));
+            user.setAuthorities(DefinedAuthority.from(currentUser.getAuthorities()));
         }
 
         //-- The following are primitive booleans and thus must be either true or false.  I believe these default to false.
