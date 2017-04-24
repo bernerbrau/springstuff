@@ -1,5 +1,6 @@
 package org.vumc.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -62,16 +63,19 @@ public class User implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return isAccountNonExpired;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return isAccountNonLocked;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return isCredentialsNonExpired;
     }
@@ -95,6 +99,7 @@ public class User implements UserDetails {
         return user;
     }
 
+    @JsonIgnore
     public boolean isConfigurableByUserAdmin() {
         return authorities.stream()
             .allMatch(DefinedAuthority::isAssignableByUserAdmin);

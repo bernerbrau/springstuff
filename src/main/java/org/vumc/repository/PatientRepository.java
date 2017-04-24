@@ -25,7 +25,6 @@ public interface PatientRepository extends CrudRepository<Patient, Long>
   @Override
   @RestResource(exported=false)
   @AllowedAuthorities(DefinedAuthority.PATIENT_SOURCE)
-  @PreAuthorize("hasAuthority('patientsource')")
   <S extends Patient> S save(S entity);
 
   @Override
