@@ -94,4 +94,9 @@ public class User implements UserDetails {
         user.setCredentialsNonExpired(userDetails.isCredentialsNonExpired());
         return user;
     }
+
+    public boolean isConfigurableByUserAdmin() {
+        return authorities.stream()
+            .allMatch(DefinedAuthority::isAssignableByUserAdmin);
+    }
 }

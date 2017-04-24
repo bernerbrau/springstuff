@@ -51,6 +51,11 @@ public enum DefinedAuthority implements GrantedAuthority
     return authority;
   }
 
+  public boolean isAssignableByUserAdmin()
+  {
+    return assignableByUserAdmin;
+  }
+
   @JsonCreator
   public static DefinedAuthority fromString(String authority) {
     return Stream.of(values())

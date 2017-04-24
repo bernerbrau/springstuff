@@ -11,7 +11,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.vumc.model.DefinedAuthority;
 import org.vumc.model.Patient;
+import org.vumc.security.annotations.AllowedAuthorities;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,16 +24,17 @@ public interface PatientRepository extends CrudRepository<Patient, Long>
 {
   @Override
   @RestResource(exported=false)
+  @AllowedAuthorities(DefinedAuthority.PATIENT_SOURCE)
   @PreAuthorize("hasAuthority('patientsource')")
   <S extends Patient> S save(S entity);
 
   @Override
   @RestResource(exported=false)
-  @PreAuthorize("hasAnyAuthority('provider','system')")
+  @AllowedAuthorities({DefinedAuthority.PROVIDER, DefinedAuthority.SYSTEM})
   Patient findOne(Long inLong);
 
   @Override
-  @PreAuthorize("hasAnyAuthority('provider','system')")
+  @AllowedAuthorities({DefinedAuthority.PROVIDER, DefinedAuthority.SYSTEM})
   Collection<Patient> findAll();
 
   @Override

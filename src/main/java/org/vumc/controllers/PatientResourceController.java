@@ -15,10 +15,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.GenericMessage;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.vumc.model.DefinedAuthority;
 import org.vumc.model.Patient;
 import org.vumc.repository.PatientRepository;
+import org.vumc.security.annotations.AllowedAuthorities;
 import org.vumc.transformations.c32.PatientC32Converter;
 
 import javax.xml.transform.TransformerException;
@@ -46,7 +47,7 @@ public class PatientResourceController
     this.newPatients = inNewPatients;
   }
 
-  @PreAuthorize("hasAuthority('patientsource')")
+  @AllowedAuthorities(DefinedAuthority.PATIENT_SOURCE)
   @RequestMapping(path = "c32", method = RequestMethod.POST,
                   consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_XML_VALUE })
   public void postC32Document(@RequestBody String inC32Request)
@@ -64,7 +65,7 @@ public class PatientResourceController
     );
   }
 
-  @PreAuthorize("hasAuthority('provider')")
+  @AllowedAuthorities(DefinedAuthority.PROVIDER)
   @RequestMapping(path = "{id}/body.html", method = RequestMethod.GET,
                   produces = MediaType.TEXT_HTML_VALUE)
   public ResponseEntity<String> getHtml(@PathVariable("id") long id) {

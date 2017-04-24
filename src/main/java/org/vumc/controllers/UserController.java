@@ -5,20 +5,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.vumc.model.DefinedAuthority;
 import org.vumc.model.User;
+import org.vumc.security.annotations.AllowedAuthorities;
 import org.vumc.users.UserDetailsManagerExt;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@PreAuthorize("hasAuthority('useradmin')")
 @RequestMapping("/api/users")
+@AllowedAuthorities(DefinedAuthority.USER_ADMIN)
 public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
@@ -34,6 +37,7 @@ public class UserController {
     }
 
     @GetMapping
+    @PostFilter("filterObject.isConfigurableByUserAdmin()")
     public List<? extends UserDetails> getUsers() throws Exception {
         LOGGER.info("Getting list of all users.");
         return userDetailsManager.findAllUsers().stream()
@@ -42,6 +46,7 @@ public class UserController {
     }
 
     @GetMapping("{username}")
+    @PostAuthorize("returnObject.isConfigurableByUserAdmin()")
     public UserDetails getUser(@PathVariable("username") String username) throws Exception {
         LOGGER.info("Getting user {}", username);
         UserDetails userDetails = userDetailsManager.loadUserByUsername(username);
@@ -55,8 +60,8 @@ public class UserController {
         userDetailsManager.createUser(userDetails);
     }
 
-
     @PutMapping("{username}")
+    @PreAuthorize("isConfigurableByUserAdmin(username)")
     public ResponseEntity<Void> updateUser(@PathVariable("username") String username,
                                            @RequestBody User user) throws Exception {
         LOGGER.info("Updating User {}", user.getUsername());
@@ -77,6 +82,7 @@ public class UserController {
     }
 
     @PatchMapping("{username}")
+    @PreAuthorize("isConfigurableByUserAdmin(username)")
     public ResponseEntity<Void> patchUser(@PathVariable("username") String username,
                                            @RequestBody User user) throws Exception {
         LOGGER.info("Patching User {}", user.getUsername());
@@ -115,8 +121,8 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-
     @DeleteMapping("{username}")
+    @PreAuthorize("isConfigurableByUserAdmin(username)")
     public ResponseEntity<Void> deleteUser(@PathVariable("username") String username) throws Exception {
         LOGGER.info("Deleting User {}", username);
 
@@ -127,6 +133,11 @@ public class UserController {
 
     private UserDetails erasePassword(UserDetails userDetails) {
         return User.fromUserDetails(userDetails, false);
+    }
+
+    protected boolean isConfigurableByUserAdmin(String username) {
+        return ((User)userDetailsManager.loadUserByUsername(username))
+                   .isConfigurableByUserAdmin();
     }
 
 }
