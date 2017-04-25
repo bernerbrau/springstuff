@@ -49,7 +49,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
   @Override
   public boolean configureMessageConverters(final List<MessageConverter> messageConverters)
   {
-    messageConverters.add(hypermediaConverter);
+    // messageConverters.add(hypermediaConverter);
     return super.configureMessageConverters(messageConverters);
   }
 

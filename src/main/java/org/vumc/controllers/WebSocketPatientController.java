@@ -30,7 +30,7 @@ public class WebSocketPatientController
 
   @ServiceActivator(inputChannel = "newPatients")
   public void broadcastNewPatient(Message<Patient> patient) {
-    webSocketTemplate.send("/topic/patients", patient);
+    webSocketTemplate.convertAndSend("/topic/patients", patient.getPayload().getId());
   }
 
 }

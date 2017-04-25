@@ -6,7 +6,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.ErrorPageFilter;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -16,7 +15,6 @@ import org.vumc.weblogic.WeblogicAnnotationConfigEmbeddedWebApplicationContext;
 
 @SpringBootApplication
 @EnableEntityLinks
-@EnableJpaAuditing(auditorAwareRef = "noopAuditor")
 @EnableTransactionManagement
 @EnableScheduling
 @PropertySource(value = "classpath:continuum.system.properties", ignoreResourceNotFound = true)

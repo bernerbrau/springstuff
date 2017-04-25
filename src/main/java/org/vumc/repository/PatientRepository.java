@@ -22,18 +22,17 @@ import java.util.List;
 public interface PatientRepository extends CrudRepository<Patient, Long>
 {
   @Override
-  @RestResource(exported=false)
-  @AllowedAuthorities(DefinedAuthority.PATIENT_SOURCE)
-  <S extends Patient> S save(S entity);
-
-  @Override
-  @RestResource(exported=false)
-  @AllowedAuthorities({DefinedAuthority.PROVIDER, DefinedAuthority.SYSTEM})
+  @AllowedAuthorities(DefinedAuthority.PROVIDER)
   Patient findOne(Long inLong);
 
   @Override
-  @AllowedAuthorities({DefinedAuthority.PROVIDER, DefinedAuthority.SYSTEM})
+  @AllowedAuthorities(DefinedAuthority.PROVIDER)
   Collection<Patient> findAll();
+
+  @Override
+  @RestResource(exported=false)
+  @AllowedAuthorities(DefinedAuthority.PATIENT_SOURCE)
+  <S extends Patient> S save(S entity);
 
   @Override
   @RestResource(exported=false)

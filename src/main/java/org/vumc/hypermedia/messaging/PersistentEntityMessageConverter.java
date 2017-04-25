@@ -52,7 +52,6 @@ public class PersistentEntityMessageConverter extends MappingJackson2MessageConv
   protected Object convertToInternal(final Object payload, final MessageHeaders headers,
                                      final Object conversionHint)
   {
-    /* FIXME this adds hypermedia links based on the CURRENT security context, which is not the same as the recipients' security context! */
     PersistentEntityResource resource =
         processors.invokeProcessorsFor(
             assembler.toFullResource(payload));
