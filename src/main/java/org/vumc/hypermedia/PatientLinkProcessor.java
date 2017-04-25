@@ -23,7 +23,7 @@ public class PatientLinkProcessor implements ResourceProcessor<Resource<Patient>
   public Resource<Patient> process(final Resource<Patient> resource)
   {
     Patient patient = resource.getContent();
-    if (patient.body != null)
+    if (patient.body != null && !patient.body.isEmpty())
     {
       resource.add(linkTo(
           methodOn(PatientResourceController.class)

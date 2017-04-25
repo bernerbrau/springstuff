@@ -32,6 +32,7 @@ class CCDXslNamespaceXPathSource implements XPathSource
     ns.bindDefaultNamespaceUri("http://ww.w3.org/2000/xmlns");
     ns.bindNamespaceUri("xsl","http://www.w3.org/1999/XSL/Transform");
     ns.bindNamespaceUri("n1","urn:hl7-org:v3");
+    ns.bindNamespaceUri("xds-b","urn:ihe:iti:xds-b:2007");
     xPath.setNamespaceContext(ns);
   }
 
