@@ -21,6 +21,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Component
@@ -63,6 +64,7 @@ class PatientC32Extractor
           });
       });
       patient.setBody(transformer.c32DocumentToHTML(c32Element));
+      patient.setCreated(ZonedDateTime.now());
       return patient;
   }
 

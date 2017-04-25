@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.List;
 
 @RepositoryRestResource
-@PreAuthorize("denyAll()")
 public interface PatientRepository extends CrudRepository<Patient, Long>
 {
   @Override
@@ -38,34 +37,42 @@ public interface PatientRepository extends CrudRepository<Patient, Long>
 
   @Override
   @RestResource(exported=false)
+  @PreAuthorize("denyAll()")
   <S extends Patient> List<S> save(Iterable<S> entities);
 
   @Override
   @RestResource(exported=false)
+  @PreAuthorize("denyAll()")
   boolean exists(Long inLong);
 
   @Override
   @RestResource(exported=false)
+  @PreAuthorize("denyAll()")
   Collection<Patient> findAll(Iterable<Long> ids);
 
   @Override
   @RestResource(exported=false)
+  @PreAuthorize("denyAll()")
   long count();
 
   @Override
   @RestResource(exported=false)
+  @PreAuthorize("denyAll()")
   void delete(Long inLong);
 
   @Override
   @RestResource(exported=false)
+  @PreAuthorize("denyAll()")
   void delete(Patient entity);
 
   @Override
   @RestResource(exported=false)
+  @PreAuthorize("denyAll()")
   void delete(Iterable<? extends Patient> entities);
 
   @Override
   @RestResource(exported=false)
+  @PreAuthorize("denyAll()")
   void deleteAll();
 
 }

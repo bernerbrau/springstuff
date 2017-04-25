@@ -16,7 +16,7 @@ import org.vumc.weblogic.WeblogicAnnotationConfigEmbeddedWebApplicationContext;
 
 @SpringBootApplication
 @EnableEntityLinks
-@EnableJpaAuditing
+@EnableJpaAuditing(auditorAwareRef = "noopAuditor")
 @EnableTransactionManagement
 @EnableScheduling
 @PropertySource(value = "classpath:continuum.system.properties", ignoreResourceNotFound = true)

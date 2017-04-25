@@ -8,9 +8,7 @@
 package org.vumc.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.base.MoreObjects;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -24,7 +22,7 @@ public class Patient
   @SequenceGenerator(name="PATIENT_SEQ",sequenceName="PATIENT_SEQ",allocationSize=1)
   public long          id;
 
-  @CreatedDate
+  @Column(nullable = false)
   public ZonedDateTime created;
 
   @Column(length=30)
