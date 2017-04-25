@@ -8,13 +8,17 @@
 package org.vumc.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.MoreObjects;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 @Entity
+@JsonInclude(NON_NULL)
 public class Patient
 {
   @Id
