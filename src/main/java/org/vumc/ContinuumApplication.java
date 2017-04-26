@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.ErrorPageFilter;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -17,6 +18,7 @@ import org.vumc.weblogic.WeblogicAnnotationConfigEmbeddedWebApplicationContext;
 @EnableEntityLinks
 @EnableTransactionManagement
 @EnableScheduling
+@EnableAspectJAutoProxy
 @PropertySource(value = "classpath:continuum.system.properties", ignoreResourceNotFound = true)
 public class ContinuumApplication
     extends SpringBootServletInitializer
