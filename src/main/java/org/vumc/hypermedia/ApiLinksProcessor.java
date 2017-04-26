@@ -14,6 +14,7 @@ import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -69,10 +70,17 @@ public class ApiLinksProcessor implements ResourceProcessor<RepositoryLinksResou
   }
 
   public void ifHasAuthority(DefinedAuthority required, Runnable r) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    UserDetails details = userDetailsService.loadUserByUsername(auth.getName());
-    if (details.getAuthorities().stream().anyMatch(a -> required.getAuthority().equalsIgnoreCase(a.getAuthority()))) {
-      r.run();
+    try
+    {
+      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+      UserDetails details = userDetailsService.loadUserByUsername(auth.getName());
+      if (details.getAuthorities().stream()
+              .anyMatch(a -> required.getAuthority().equalsIgnoreCase(a.getAuthority())))
+      {
+        r.run();
+      }
+    } catch (AuthenticationException ex) {
+      // Safe to ignore this - just assume the authority is not present.
     }
   }
 

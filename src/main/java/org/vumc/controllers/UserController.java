@@ -63,7 +63,7 @@ public class UserController {
     }
 
     @PutMapping("{username}")
-    @PreAuthorize("isConfigurableByUserAdmin(username)")
+    @PreAuthorize("@userController.isConfigurableByUserAdmin(#username)")
     public ResponseEntity<Void> updateUser(@PathVariable("username") String username,
                                            @RequestBody User user) throws Exception {
         LOGGER.info("Updating User {}", user.getUsername());
@@ -84,7 +84,7 @@ public class UserController {
     }
 
     @PatchMapping("{username}")
-    @PreAuthorize("isConfigurableByUserAdmin(username)")
+    @PreAuthorize("@userController.isConfigurableByUserAdmin(#username)")
     public ResponseEntity<Void> patchUser(@PathVariable("username") String username,
                                            @RequestBody User user) throws Exception {
         LOGGER.info("Patching User {}", user.getUsername());
@@ -124,7 +124,7 @@ public class UserController {
     }
 
     @DeleteMapping("{username}")
-    @PreAuthorize("isConfigurableByUserAdmin(username)")
+    @PreAuthorize("@userController.isConfigurableByUserAdmin(#username)")
     public ResponseEntity<Void> deleteUser(@PathVariable("username") String username) throws Exception {
         LOGGER.info("Deleting User {}", username);
 
@@ -137,7 +137,7 @@ public class UserController {
         return User.fromUserDetails(userDetails, false);
     }
 
-    protected boolean isConfigurableByUserAdmin(String username) {
+    public boolean isConfigurableByUserAdmin(String username) {
         return ((User)userDetailsManager.loadUserByUsername(username))
                    .isConfigurableByUserAdmin();
     }
