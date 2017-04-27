@@ -5,7 +5,7 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc.hypermedia;
+package org.vumc.hypermedia.links;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.vumc.controllers.ClientLogController;
 import org.vumc.controllers.LoginController;
 import org.vumc.model.DefinedAuthority;
 import org.vumc.model.Patient;
@@ -50,6 +51,10 @@ public class ApiLinksProcessor implements ResourceProcessor<RepositoryLinksResou
       resource.add(linkTo(LoginController.class).withRel("login"))
     );
 
+    ifAuthenticated(() ->
+      resource.add(linkTo(ClientLogController.class).withRel("log"))
+    );
+
     ifHasAuthority(DefinedAuthority.PROVIDER, () ->
       resource.add(entityLinks.linkToCollectionResource(Patient.class))
     );
@@ -68,6 +73,14 @@ public class ApiLinksProcessor implements ResourceProcessor<RepositoryLinksResou
       r.run();
     }
   }
+
+  public void ifAuthenticated(Runnable r) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (!(auth instanceof AnonymousAuthenticationToken) && auth.isAuthenticated()) {
+      r.run();
+    }
+  }
+
 
   public void ifHasAuthority(DefinedAuthority required, Runnable r) {
     try

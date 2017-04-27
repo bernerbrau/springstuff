@@ -2,6 +2,7 @@ package org.vumc.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.hateoas.ResourceSupport;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -9,17 +10,17 @@ import java.util.Collection;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonInclude(NON_NULL)
-public class User implements UserDetails {
+public class User extends ResourceSupport implements UserDetails
+{
+  private Collection<DefinedAuthority> authorities;
+  private String password;
+  private String username;
+  private boolean isAccountNonExpired;
+  private boolean isAccountNonLocked;
+  private boolean isCredentialsNonExpired;
+  private boolean isEnabled;
 
-    private Collection<DefinedAuthority> authorities;
-    private String password;
-    private String username;
-    private boolean isAccountNonExpired;
-    private boolean isAccountNonLocked;
-    private boolean isCredentialsNonExpired;
-    private boolean isEnabled;
-
-    public void setAuthorities(Collection<DefinedAuthority> authorities) {
+  public void setAuthorities(Collection<DefinedAuthority> authorities) {
         this.authorities = authorities;
     }
 

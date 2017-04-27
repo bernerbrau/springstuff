@@ -4,6 +4,7 @@ package org.vumc.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -12,14 +13,18 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.vumc.hypermedia.assembler.UserResourceAssembler;
+import org.vumc.hypermedia.util.ResourceCollection;
 import org.vumc.model.DefinedAuthority;
 import org.vumc.model.User;
 import org.vumc.security.annotations.AllowedAuthorities;
 import org.vumc.users.UserDetailsManagerExt;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+
+@RepositoryRestController
 @RestController
 @RequestMapping("/api/users")
 @ExposesResourceFor(User.class)
@@ -30,29 +35,34 @@ public class UserController {
 
     private UserDetailsManagerExt userDetailsManager;
     private PasswordEncoder passwordEncoder;
+    private UserResourceAssembler resourceAssembler;
 
     @Autowired
     public UserController(final UserDetailsManagerExt inUserMgr,
-                          PasswordEncoder inpasswordEncoder){
+                          PasswordEncoder inpasswordEncoder,
+                          UserResourceAssembler inResourceAssembler){
         userDetailsManager = inUserMgr;
         passwordEncoder = inpasswordEncoder;
+        resourceAssembler = inResourceAssembler;
     }
 
     @GetMapping
     @PostFilter("filterObject.isConfigurableByUserAdmin()")
-    public List<? extends UserDetails> getUsers() throws Exception {
+    public ResourceCollection<User> getUsers() throws Exception {
         LOGGER.info("Getting list of all users.");
-        return userDetailsManager.findAllUsers().stream()
-                .map(this::erasePassword)
-                .collect(Collectors.toList());
+        List<? extends UserDetails> list = userDetailsManager.findAllUsers();
+        return new ResourceCollection<>(
+              resourceAssembler.toResources(list),
+              linkTo(UserController.class).withSelfRel());
     }
 
-    @GetMapping("{username}")
+    @GetMapping(path = "{username}")
     @PostAuthorize("returnObject.isConfigurableByUserAdmin()")
-    public UserDetails getUser(@PathVariable("username") String username) throws Exception {
+    public User getUser(@PathVariable("username") String username) throws Exception {
         LOGGER.info("Getting user {}", username);
         UserDetails userDetails = userDetailsManager.loadUserByUsername(username);
-        return this.erasePassword(userDetails);
+
+        return resourceAssembler.toResource(userDetails);
     }
 
     @PostMapping
@@ -62,7 +72,7 @@ public class UserController {
         userDetailsManager.createUser(userDetails);
     }
 
-    @PutMapping("{username}")
+    @PutMapping(path = "{username}")
     @PreAuthorize("@userController.isConfigurableByUserAdmin(#username)")
     public ResponseEntity<Void> updateUser(@PathVariable("username") String username,
                                            @RequestBody User user) throws Exception {
@@ -83,7 +93,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("{username}")
+    @PatchMapping(path = "{username}")
     @PreAuthorize("@userController.isConfigurableByUserAdmin(#username)")
     public ResponseEntity<Void> patchUser(@PathVariable("username") String username,
                                            @RequestBody User user) throws Exception {
@@ -123,18 +133,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("{username}")
+    @DeleteMapping(path = "{username}")
     @PreAuthorize("@userController.isConfigurableByUserAdmin(#username)")
     public ResponseEntity<Void> deleteUser(@PathVariable("username") String username) throws Exception {
         LOGGER.info("Deleting User {}", username);
 
         userDetailsManager.deleteUser(username);
         return ResponseEntity.noContent().build();
-    }
-
-
-    private UserDetails erasePassword(UserDetails userDetails) {
-        return User.fromUserDetails(userDetails, false);
     }
 
     public boolean isConfigurableByUserAdmin(String username) {

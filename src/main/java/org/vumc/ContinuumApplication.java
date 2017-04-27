@@ -8,6 +8,8 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.hateoas.config.EnableEntityLinks;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.WebApplicationInitializer;
@@ -19,6 +21,7 @@ import org.vumc.weblogic.WeblogicAnnotationConfigEmbeddedWebApplicationContext;
 @EnableTransactionManagement
 @EnableScheduling
 @EnableAspectJAutoProxy
+@EnableHypermediaSupport(type = HypermediaType.HAL)
 @PropertySource(value = "classpath:continuum.system.properties", ignoreResourceNotFound = true)
 public class ContinuumApplication
     extends SpringBootServletInitializer

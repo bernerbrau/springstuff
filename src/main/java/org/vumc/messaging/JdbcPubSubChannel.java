@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.QueryTimeoutException;
@@ -51,6 +52,7 @@ public class JdbcPubSubChannel extends PublishSubscribeChannel
 
   @Autowired
   public JdbcPubSubChannel(final JdbcTemplate inJdbcTemplate,
+                           @Qualifier("objectMapper")
                            final ObjectMapper inObjectMapper,
                            final TransactionTemplate inTx,
                            @Value("${server.node.identifier}")

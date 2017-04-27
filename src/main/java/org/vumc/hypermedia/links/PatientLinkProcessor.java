@@ -5,7 +5,7 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc.hypermedia;
+package org.vumc.hypermedia.links;
 
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
