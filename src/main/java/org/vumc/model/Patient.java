@@ -42,6 +42,10 @@ public class Patient
   @JsonIgnore
   public String body;
 
+  @Lob
+  @JsonIgnore
+  public String rawMessage;
+
   @Override
   public String toString()
   {
@@ -121,5 +125,14 @@ public class Patient
   {
     body = inBody;
   }
+
+  public String getRawMessage() {
+    return rawMessage;
+  }
+
+  public void setRawMessage(final String inRawMessage) {
+    rawMessage = inRawMessage;
+  }
+
 
 }

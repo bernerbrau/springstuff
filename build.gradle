@@ -172,6 +172,7 @@ dependencies {
         exclude module: 'logback-classic'
         exclude module: 'log4j-over-slf4j'
     }
+
 }
 
 compileJava.dependsOn(processResources)

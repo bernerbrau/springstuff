@@ -45,18 +45,18 @@ public class PatientC32Converter
   public Patient convert(String xmlAsString) {
     try (InputStream xmlAsStream = new ByteArrayInputStream(xmlAsString.getBytes(Charsets.UTF_8)))
     {
-      return convert(xmlAsStream);
+      return convert(xmlAsStream, xmlAsString);
     }
     catch (IOException e) {
       throw new InvalidTransformationResultException("Error parsing C32 document: " + e.getMessage());
     }
   }
 
-  public Patient convert(InputStream xmlAsStream) {
+  public Patient convert(InputStream xmlAsStream, String xmlAsString) {
     try
     {
       Node node = finder.findC32Document(docBuilder.parse(xmlAsStream));
-      return extractor.extractPatient(node);
+      return extractor.extractPatient(node, xmlAsString);
     }
     catch (IOException | SAXException | XPathExpressionException | TransformerException e) {
       throw new InvalidTransformationResultException("Error parsing C32 document: " + e.getMessage());

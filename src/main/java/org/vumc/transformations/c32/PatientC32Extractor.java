@@ -38,7 +38,7 @@ class PatientC32Extractor
     transformer = inTransformer;
   }
 
-  Patient extractPatient(Node c32Element)
+  Patient extractPatient(Node c32Element, String xmlAsString)
       throws XPathExpressionException, TransformerException, IOException
   {
       final Patient patient = new Patient();
@@ -64,6 +64,7 @@ class PatientC32Extractor
           });
       });
       patient.setBody(transformer.c32DocumentToHTML(c32Element));
+      patient.setRawMessage(xmlAsString);
       patient.setCreated(ZonedDateTime.now());
       return patient;
   }
