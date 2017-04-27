@@ -7,8 +7,6 @@
  */
 package org.vumc.transformations.c32;
 
-import fj.function.TryEffect0;
-import fj.function.TryEffect1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vumc.model.Patient;
@@ -16,10 +14,10 @@ import org.vumc.model.PatientName;
 import org.vumc.transformations.xml.XPathSource;
 import org.w3c.dom.Node;
 
-import javax.xml.transform.TransformerException;
+import fj.function.TryEffect0;
+import fj.function.TryEffect1;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -39,7 +37,7 @@ class PatientC32Extractor
   }
 
   Patient extractPatient(Node c32Element, String xmlAsString)
-      throws XPathExpressionException, TransformerException, IOException
+      throws Exception
   {
       final Patient patient = new Patient();
       doInNode(c32Element, "/n1:ClinicalDocument/n1:recordTarget/n1:patientRole", roleNode -> {

@@ -7,29 +7,31 @@
  */
 package org.vumc.transformations.c32;
 
-import com.google.common.base.Charsets;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.codec.Base64;
-import org.springframework.stereotype.Component;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.codec.Base64;
+import org.springframework.stereotype.Component;
+import org.vumc.transformations.xml.XPathSource;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import com.google.common.base.Charsets;
 
 @Component
 class PatientDocumentC32Finder
 {
   private final DocumentBuilder            docBuilder;
-  private       CCDXslNamespaceXPathSource xPath;
+  private       XPathSource xPath;
 
   @Autowired
-  public PatientDocumentC32Finder(CCDXslNamespaceXPathSource xPath)
+  public PatientDocumentC32Finder(XPathSource xPath)
       throws ParserConfigurationException
   {
     this.xPath = xPath;

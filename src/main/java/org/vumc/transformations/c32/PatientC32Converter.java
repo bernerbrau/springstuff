@@ -7,18 +7,15 @@
  */
 package org.vumc.transformations.c32;
 
-import com.google.common.base.Charsets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vumc.model.Patient;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
+import com.google.common.base.Charsets;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +55,7 @@ public class PatientC32Converter
       Node node = finder.findC32Document(docBuilder.parse(xmlAsStream));
       return extractor.extractPatient(node, xmlAsString);
     }
-    catch (IOException | SAXException | XPathExpressionException | TransformerException e) {
+    catch (Exception e) {
       throw new InvalidTransformationResultException("Error parsing C32 document: " + e.getMessage());
     }
   }
