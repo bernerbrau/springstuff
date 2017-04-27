@@ -36,7 +36,7 @@ public class PatientC32ConverterTest
     assertEquals("<html>Hello</html>", patient.getBody());
     assertEquals(sampleMessage(), patient.getRawMessage());
     assertEquals("HOOT", patient.getName().getFamily());
-    assertEquals("Notice the extractor does not trim whitespace", "SCOOT ", patient.getName().getGiven());
+    assertEquals("SCOOT", patient.getName().getGiven());
     assertEquals("Full name is not populated currently", null, patient.getName().getName());
     assertEquals("Suffix not supplied in this message", null, patient.getName().getSuffix());
     assertEquals("AACJ-4531-1", patient.getPatientId());

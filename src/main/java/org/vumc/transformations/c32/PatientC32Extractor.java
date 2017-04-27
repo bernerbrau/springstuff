@@ -48,8 +48,8 @@ class PatientC32Extractor
                 doInNode(nameNode, "./n1:family",
                     family ->
                     {
-                      doForString(nameNode,"./n1:family",name::setFamily);
-                      doForString(nameNode,"./n1:given",name::setGiven);
+                      doForString(nameNode, "./n1:family", name::setFamily);
+                      doForString(nameNode, "./n1:given", val -> name.setGiven(val.trim()));
                       doForString(nameNode,"./n1:suffix",name::setSuffix);
                     },
                     () -> doForString(nameNode,"normalize-space(.)",name::setName)
@@ -71,7 +71,7 @@ class PatientC32Extractor
   void doInNode(final Node node, final String path, TryEffect1<Node, E> action)
       throws XPathExpressionException, E
   {
-    doInNode(node, path, action, () -> {});
+    doInNode(node, path, action, () -> {System.out.println("Hello");});
   }
 
   private <E extends Exception>
