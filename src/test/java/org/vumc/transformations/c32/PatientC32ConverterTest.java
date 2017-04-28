@@ -1,29 +1,34 @@
 package org.vumc.transformations.c32;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
+import org.springframework.context.ApplicationContext;
 import org.vumc.model.Patient;
-import org.w3c.dom.Node;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class PatientC32ConverterTest
 {
   private PatientC32Converter converter;
+  private PatientC32DocumentTransformer transformer;
+
 
   @Before
   public void setUp() throws Exception
   {
-    PatientC32DocumentTransformer mockC32ToHtmlTransformer = mock(PatientC32DocumentTransformer.class);
-    when(mockC32ToHtmlTransformer.c32DocumentToHTML(any(Node.class))).thenReturn("<html>Hello</html>");
+
+    ApplicationContext ctx = new AnnotationConfigEmbeddedWebApplicationContext();
+    transformer = new PatientC32DocumentTransformer(ctx);
 
     CCDXslNamespaceXPathSource xPathSource = new CCDXslNamespaceXPathSource();
 
     PatientDocumentC32Finder finder = new PatientDocumentC32Finder(xPathSource);
-    PatientC32Extractor extractor = new PatientC32Extractor(xPathSource, mockC32ToHtmlTransformer);
+    PatientC32Extractor extractor = new PatientC32Extractor(xPathSource, transformer);
     converter = new PatientC32Converter(finder, extractor);
   }
 
@@ -33,7 +38,7 @@ public class PatientC32ConverterTest
 
     Patient patient = converter.convert(sampleMessage());
 
-    assertEquals("<html>Hello</html>", patient.getBody());
+    assertEquals(sampleMessage_PatientBody(), patient.getBody().replaceAll("(\\r)", ""));
     assertEquals(sampleMessage(), patient.getRawMessage());
     assertEquals("HOOT", patient.getName().getFamily());
     assertEquals("SCOOT", patient.getName().getGiven());
@@ -41,13 +46,30 @@ public class PatientC32ConverterTest
     assertEquals("Suffix not supplied in this message", null, patient.getName().getSuffix());
     assertEquals("AACJ-4531-1", patient.getPatientId());
     assertEquals("Gender not supplied in this message", null, patient.getGender());
-//    assertTrue(ZonedDateTime.now().secon(patient.getCreated().) < 1000);
+    assertTrue("CreatedDate not set within 1000 ms of actual time."
+            ,ChronoUnit.MILLIS.between(patient.getCreated(), ZonedDateTime.now())< 1000);
+
   }
 
   @Test
-  public void canParseMessageWithEncodedBody()
+  public void canParseMessageWithEncodedBody() throws Exception
   {
+    Patient patient = converter.convert(sampleMessage2());
+    assertEquals(sampleMessage_PatientBody2(), patient.getBody().replaceAll("(\\r)", ""));
+    assertEquals(sampleMessage2(), patient.getRawMessage());
+    assertEquals("CADENCE", patient.getName().getFamily());
+    assertEquals("JOANIE", patient.getName().getGiven());
+    assertEquals("Full name is not populated currently", null, patient.getName().getName());
+    assertEquals("Suffix not supplied in this message", null, patient.getName().getSuffix());
+    assertEquals("002102283", patient.getPatientId());
+    assertEquals("F", patient.getGender());
+    assertTrue("CreatedDate not set within 1000 ms of actual time."
+            ,ChronoUnit.MILLIS.between(patient.getCreated(), ZonedDateTime.now())< 1000);
   }
+
+
+
+
 
   private String sampleMessage()
   {
@@ -396,6 +418,123 @@ public class PatientC32ConverterTest
             "</ns3:ClinicalDocument>";
   }
 
+  private String sampleMessage_PatientBody()
+  {
+    return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n" +
+            "<html xmlns:n1=\"urn:hl7-org:v3\">\n" +
+            "<head>\n" +
+            "<META http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\">\n" +
+            "<link href=\"https://www.orionhealth.com/software/ccd/style/skin_v2.4.css\" rel=\"stylesheet\" type=\"text/css\">\n" +
+            "<!--Do NOT edit this HTML directly, it was generated via an XSLt transformation from the original release 2 CDA Document.-->\n" +
+            "<title>Continuity of Care Document</title>\n" +
+            "</head>\n" +
+            "<!--\n" +
+            "\t\t\t\tCopyright 2011 Orion Health group of companies. All Rights Reserved.  \t\t\t\n" +
+            "\t\t\t-->\n" +
+            "<body>\n" +
+            "<h2 align=\"center\">Continuity of Care Document</h2>\n" +
+            "<p align=\"center\">\n" +
+            "<b>Created On: </b>March 13, 2017</p>\n" +
+            "<hr>\n" +
+            "<div class=\"header\">\n" +
+            "<div class=\"demographics sticky\">\n" +
+            "<div class=\"bl\">\n" +
+            "<div class=\"br\">\n" +
+            "<div class=\"tr\">\n" +
+            "<div class=\"person-name\">HOOT, SCOOT </div>\n" +
+            "<div class=\"sex-age\">\n" +
+            "<span id=\"calculatedAge\"></span>\n" +
+            "</div>\n" +
+            "<div class=\"id\">AACJ-4531-1<span class=\"label\">\n" +
+            "\t\t\t\t\t\t\t\t\t\t\t(ORION)\n" +
+            "\t\t\t\t\t\t\t\t\t\t</span>\n" +
+            "<br>\n" +
+            "<br>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "<div class=\"section\">\n" +
+            "<b>Electronically generated</b><b> by </b>Vanderbilt Health Affiliated Network<b> on </b>March 13, 2017</div>\n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N65879\" href=\"#toc\">\n" +
+            "<h2>Alerts, Allergies and Adverse Reactions</h2>\n" +
+            "</a></span>\n" +
+            "</div>                                                \n" +
+            "<p>Allergies Unknown</p>                    \n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N66021\" href=\"#toc\">\n" +
+            "<h2>Problems</h2>\n" +
+            "</a></span>\n" +
+            "</div>                                                \n" +
+            "<p>Medical History Unknown</p>                    \n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N66153\" href=\"#toc\">\n" +
+            "<h2>Medications</h2>\n" +
+            "</a></span>\n" +
+            "</div>                                                \n" +
+            "<p>Drug Treatment Unknown</p>                    \n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N66280\" href=\"#toc\">\n" +
+            "<h2>Procedures</h2>\n" +
+            "</a></span>\n" +
+            "</div>                                                \n" +
+            "<p>No Known Procedure</p>                    \n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N66362\" href=\"#toc\">\n" +
+            "<h2>Results</h2>\n" +
+            "</a></span>\n" +
+            "</div>                                                \n" +
+            "<p>No Known Results</p>                    \n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N66471\" href=\"#toc\">\n" +
+            "<h2>Encounters</h2>\n" +
+            "</a></span>\n" +
+            "</div>                                                \n" +
+            "<p>No Known Encounter</p>                    \n" +
+            "</body>\n" +
+            "<script language=\"JavaScript\" type=\"text/javascript\">\n" +
+            "\t\t\t\tvar today = new Date();\n" +
+            "\t\t\t\tvar age = 0;\n" +
+            "\t\t\t\tvar xmlDob  = '';\n" +
+            "\t\t\t\tif (xmlDob.length > 0) {\n" +
+            "\t\t\t\t\tvar dob = parseInt(xmlDob.substring(0, 8));\n" +
+            "\t\t\t\t\t//Script return month from 0 to 11 not from 1 to 12. Thats why the month has been incremented by 1.\n" +
+            "\t\t\t\t\tvar todayMonth = (today.getMonth() + 1) + '';\n" +
+            "\t\t\t\t\tif (todayMonth.length == 1) {\n" +
+            "\t\t\t\t\t\ttodayMonth = \"0\" + todayMonth;\n" +
+            "\t\t\t\t\t}\n" +
+            "\t\t\t\t\tvar todayDate = today.getDate() + '';\n" +
+            "\t\t\t\t\tif (todayDate.length == 1) {\n" +
+            "\t\t\t\t\t\ttodayDate = \"0\" + todayDate;\n" +
+            "\t\t\t\t\t}\n" +
+            "\t\t\t\t\tvar today = parseInt('' + today.getFullYear() + todayMonth + todayDate);\n" +
+            "\t\t\t\t\tage = Math.floor((today - dob) / 10000);\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t\tvar ageWithSeparator='';\n" +
+            "\n" +
+            "\t\t\t\tvar gender = '';\n" +
+            "\t\t\t\t\n" +
+            "\t\t\t\t// The forward slash depends on gender and age i.e age is greater than one year.\n" +
+            "\t\t\t\tif (gender.length != 0 && age != 0) {\n" +
+            "\t\t\t\t\tageWithSeparator = \"/\";\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t\tif (age != 0) {\n" +
+            "\t\t\t\t\tageWithSeparator = ageWithSeparator + age + 'y';\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t\t//First inner condition: When the Gender is present and the DOB is greater than or equal to one year\n" +
+            "\t\t\t\t//Second inner condition: When the Gender is not present and the DOB greater than or equal to one year\n" +
+            "\t\t\t\tif ((xmlDob.length != 0 && gender.length != 0) || age != 0) {\n" +
+            "\t\t\t\t\tageWithSeparator = ageWithSeparator + ', ';\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t\tdocument.getElementById('calculatedAge').innerHTML = ageWithSeparator;\n" +
+            "\t\t\t</script>\n" +
+            "</html>\n";
+  }
+
+
   private String sampleMessage2()
   {
     return
@@ -417,4 +556,174 @@ public class PatientC32ConverterTest
             "  </env:Body>" +
             "</env:Envelope>";
   }
+
+  private String sampleMessage_PatientBody2()
+  {
+    return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n" +
+            "<html xmlns:n1=\"urn:hl7-org:v3\">\n" +
+            "<head>\n" +
+            "<META http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\">\n" +
+            "<link href=\"https://www.orionhealth.com/software/ccd/style/skin_v2.4.css\" rel=\"stylesheet\" type=\"text/css\">\n" +
+            "<!--Do NOT edit this HTML directly, it was generated via an XSLt transformation from the original release 2 CDA Document.-->\n" +
+            "<title>Continuity of Care Document</title>\n" +
+            "</head>\n" +
+            "<!--\n" +
+            "\t\t\t\tCopyright 2011 Orion Health group of companies. All Rights Reserved.  \t\t\t\n" +
+            "\t\t\t-->\n" +
+            "<body>\n" +
+            "<h2 align=\"center\">Continuity of Care Document</h2>\n" +
+            "<p align=\"center\">\n" +
+            "<b>Created On: </b>April 25, 2017</p>\n" +
+            "<hr>\n" +
+            "<div class=\"header\">\n" +
+            "<div class=\"demographics sticky\">\n" +
+            "<div class=\"bl\">\n" +
+            "<div class=\"br\">\n" +
+            "<div class=\"tr\">\n" +
+            "<div class=\"person-name\">CADENCE, JOANIE </div>\n" +
+            "<div class=\"sex-age\">\n" +
+            "<span>Female</span><span id=\"calculatedAge\"></span>25-Apr-1975<span class=\"label\"> (DOB)</span>\n" +
+            "</div>\n" +
+            "<div class=\"id\">002102283<span class=\"label\">\n" +
+            "\t\t\t\t\t\t\t\t\t\t\t(Vanderbilt University Medical Center)\n" +
+            "\t\t\t\t\t\t\t\t\t\t</span>\n" +
+            "<br>11 INWOOD RD<br>SHORT HILLS,\n" +
+            "\t\t\t\tNJ,\n" +
+            "\t\t\t\tUS,\n" +
+            "\t\t\t\t07078<br>(973) 912-4439</div>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "<div class=\"section\">\n" +
+            "<b>Electronically generated</b><b> by </b>Vanderbilt Health Affiliated Network<b> on </b>April 25, 2017</div>\n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N65869\" href=\"#toc\">\n" +
+            "<h2>Alerts, Allergies and Adverse Reactions</h2>\n" +
+            "</a></span>\n" +
+            "</div>\n" +
+            "                        \n" +
+            "                        \n" +
+            "<p>Allergies Unknown</p>\n" +
+            "                    \n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N66014\" href=\"#toc\">\n" +
+            "<h2>Problems</h2>\n" +
+            "</a></span>\n" +
+            "</div>\n" +
+            "                        \n" +
+            "                        \n" +
+            "<p>Medical History Unknown</p>\n" +
+            "                    \n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N66149\" href=\"#toc\">\n" +
+            "<h2>Medications</h2>\n" +
+            "</a></span>\n" +
+            "</div>\n" +
+            "                        \n" +
+            "                        \n" +
+            "<p>Drug Treatment Unknown</p>\n" +
+            "                    \n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N66279\" href=\"#toc\">\n" +
+            "<h2>Procedures</h2>\n" +
+            "</a></span>\n" +
+            "</div>\n" +
+            "                        \n" +
+            "                        \n" +
+            "<p>No Known Procedure</p>\n" +
+            "                    \n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N66364\" href=\"#toc\">\n" +
+            "<h2>Results</h2>\n" +
+            "</a></span>\n" +
+            "</div>\n" +
+            "                        \n" +
+            "                        \n" +
+            "<p>No Known Results</p>\n" +
+            "                    \n" +
+            "<div class=\"section\">\n" +
+            "<span><a name=\"N66483\" href=\"#toc\">\n" +
+            "<h2>Encounters</h2>\n" +
+            "</a></span>\n" +
+            "</div>\n" +
+            "                        \n" +
+            "                        \n" +
+            "<table class=\"data\">\n" +
+            "                            \n" +
+            "<thead>\n" +
+            "\n" +
+            "<tr class=\"yui-dt-even\">\n" +
+            "    \n" +
+            "<th class=\"table\" style=\"background-color:#ffffff; padding:6px; color:#5D646C\">Encounter</th>\n" +
+            "    <th class=\"table\" style=\"background-color:#ffffff; padding:6px; color:#5D646C\">Location</th>\n" +
+            "    <th class=\"table\" style=\"background-color:#ffffff; padding:6px; color:#5D646C\">Admission</th>\n" +
+            "    <th class=\"table\" style=\"background-color:#ffffff; padding:6px; color:#5D646C\">Discharge</th>\n" +
+            "    <th class=\"table\" style=\"background-color:#ffffff; padding:6px; color:#5D646C\">Billing Code</th>\n" +
+            "\n" +
+            "</tr>\n" +
+            "                            \n" +
+            "</thead>\n" +
+            "                            \n" +
+            "<tbody>\n" +
+            "\n" +
+            "<tr class=\"yui-dt-even\">\n" +
+            "    \n" +
+            "<td class=\"table\" style=\"padding:6px\">\n" +
+            "        Outpatient\n" +
+            "    </td>\n" +
+            "    <td class=\"table\" style=\"padding:6px\">VUMC-FAC</td>\n" +
+            "    <td class=\"table\" style=\"padding:6px\">04/25/2017</td>\n" +
+            "    <td class=\"table\" style=\"padding:6px\"></td>\n" +
+            "    <td class=\"table\" style=\"padding:6px\"></td>\n" +
+            "\n" +
+            "</tr>\n" +
+            "                            \n" +
+            "</tbody>\n" +
+            "                        \n" +
+            "</table>\n" +
+            "                    \n" +
+            "</body>\n" +
+            "<script language=\"JavaScript\" type=\"text/javascript\">\n" +
+            "\t\t\t\tvar today = new Date();\n" +
+            "\t\t\t\tvar age = 0;\n" +
+            "\t\t\t\tvar xmlDob  = '19750425';\n" +
+            "\t\t\t\tif (xmlDob.length > 0) {\n" +
+            "\t\t\t\t\tvar dob = parseInt(xmlDob.substring(0, 8));\n" +
+            "\t\t\t\t\t//Script return month from 0 to 11 not from 1 to 12. Thats why the month has been incremented by 1.\n" +
+            "\t\t\t\t\tvar todayMonth = (today.getMonth() + 1) + '';\n" +
+            "\t\t\t\t\tif (todayMonth.length == 1) {\n" +
+            "\t\t\t\t\t\ttodayMonth = \"0\" + todayMonth;\n" +
+            "\t\t\t\t\t}\n" +
+            "\t\t\t\t\tvar todayDate = today.getDate() + '';\n" +
+            "\t\t\t\t\tif (todayDate.length == 1) {\n" +
+            "\t\t\t\t\t\ttodayDate = \"0\" + todayDate;\n" +
+            "\t\t\t\t\t}\n" +
+            "\t\t\t\t\tvar today = parseInt('' + today.getFullYear() + todayMonth + todayDate);\n" +
+            "\t\t\t\t\tage = Math.floor((today - dob) / 10000);\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t\tvar ageWithSeparator='';\n" +
+            "\n" +
+            "\t\t\t\tvar gender = 'F';\n" +
+            "\t\t\t\t\n" +
+            "\t\t\t\t// The forward slash depends on gender and age i.e age is greater than one year.\n" +
+            "\t\t\t\tif (gender.length != 0 && age != 0) {\n" +
+            "\t\t\t\t\tageWithSeparator = \"/\";\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t\tif (age != 0) {\n" +
+            "\t\t\t\t\tageWithSeparator = ageWithSeparator + age + 'y';\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t\t//First inner condition: When the Gender is present and the DOB is greater than or equal to one year\n" +
+            "\t\t\t\t//Second inner condition: When the Gender is not present and the DOB greater than or equal to one year\n" +
+            "\t\t\t\tif ((xmlDob.length != 0 && gender.length != 0) || age != 0) {\n" +
+            "\t\t\t\t\tageWithSeparator = ageWithSeparator + ', ';\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t\tdocument.getElementById('calculatedAge').innerHTML = ageWithSeparator;\n" +
+            "\t\t\t</script>\n" +
+            "</html>\n";
+  }
+
+
+
 }

@@ -52,8 +52,8 @@ public class PatientC32Converter
   public Patient convert(InputStream xmlAsStream, String xmlAsString) {
     try
     {
-      Node node = finder.findC32Document(docBuilder.parse(xmlAsStream));
-      return extractor.extractPatient(node, xmlAsString);
+      Node c32Element = finder.findC32Document(docBuilder.parse(xmlAsStream));
+      return extractor.extractPatient(c32Element, xmlAsString);
     }
     catch (Exception e) {
       throw new InvalidTransformationResultException("Error parsing C32 document: " + e.getMessage());
