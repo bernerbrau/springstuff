@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.vumc.hypermedia.assembler.UserResourceAssembler;
-import org.vumc.hypermedia.util.ResourceCollection;
+import org.vumc.hypermedia.kludges.ResourceCollection;
 import org.vumc.model.DefinedAuthority;
 import org.vumc.model.User;
 import org.vumc.security.annotations.AllowedAuthorities;

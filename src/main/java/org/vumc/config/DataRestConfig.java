@@ -7,6 +7,7 @@
  */
 package org.vumc.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
@@ -22,6 +23,7 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.data.rest.webmvc.mapping.Associations;
 import org.springframework.data.rest.webmvc.support.PersistentEntityProjector;
+import org.springframework.hateoas.mvc.ResourceProcessorInvoker;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -79,7 +81,9 @@ public class DataRestConfig
       public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config)
       {
         config.exposeIdsFor(Patient.class);
+        config.getMetadataConfiguration().setAlpsEnabled(false);
       }
     };
   }
+
 }

@@ -80,8 +80,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             // Public portions of the API
             "/api",
             "/api/login",
-            "/api/profile",
-            "/api/profile/**",
 
             // Static files
             "**/*.html",

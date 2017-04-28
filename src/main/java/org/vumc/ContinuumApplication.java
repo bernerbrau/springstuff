@@ -3,7 +3,6 @@ package org.vumc;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.ErrorPageFilter;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
@@ -41,7 +40,6 @@ public class ContinuumApplication
   protected WebApplicationContext run(SpringApplication application) {
     // HACK to fix this problem: https://github.com/spring-projects/spring-boot/issues/2643
     application.setApplicationContextClass(WeblogicAnnotationConfigEmbeddedWebApplicationContext.class);
-    application.getSources().remove(ErrorPageFilter.class);
     return super.run(application);
   }
 
