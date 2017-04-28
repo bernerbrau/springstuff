@@ -62,6 +62,7 @@ war {
 	// Download and build ContinuumWeb, removing "http://localhost:8080" from urls
 	dependsOn npm_run_build
 	from (webProjectOutputDir) {
+        exclude("public/**")
 		filter{ line -> line
 				.replaceAll(/http:\/\/localhost:\d+\//,'/continuum/')
 				.replaceAll('src="/','src="/continuum/')
@@ -69,6 +70,10 @@ war {
                 .replaceAll(/url\(\//,'url(/continuum/')
                 .replaceAll(/\/(continuum\/){2,}/,'/continuum/')}
 	}
+    from (webProjectOutputDir) {
+        include("public/**")
+    }
+
     // Spring Boot IDEA plugin doesn't recognize "provided", exclude these jars manually instead
     classpath = classpath.filter {f -> !f.name.toLowerCase().find(/undertow|tomcat|jetty|h2|ojdbc/)}
 }

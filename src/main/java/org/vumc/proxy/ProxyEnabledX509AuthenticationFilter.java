@@ -22,16 +22,16 @@ import java.util.regex.Pattern;
 
 public class ProxyEnabledX509AuthenticationFilter extends X509AuthenticationFilter
 {
-  private final Pattern subjectPrincipalRegex;
-  private final String subjectDNProxyHeader;
-  private final String brokerAuthority;
+  private final Pattern          subjectPrincipalRegex;
+  private final String           subjectDNProxyHeader;
+  private final GrantedAuthority brokerAuthority;
 
   private AuthenticationManager authenticationManager;
 
   public ProxyEnabledX509AuthenticationFilter(
       final String inSubjectDNProxyHeader,
       final String inSubjectPrincipalRegex,
-      final String inBrokerAuthority)
+      final GrantedAuthority inBrokerAuthority)
   {
     this.subjectDNProxyHeader = inSubjectDNProxyHeader;
     this.subjectPrincipalRegex = Pattern.compile(inSubjectPrincipalRegex);
@@ -48,7 +48,7 @@ public class ProxyEnabledX509AuthenticationFilter extends X509AuthenticationFilt
 
     if (authResult.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
-            .anyMatch(brokerAuthority::equalsIgnoreCase)) {
+            .anyMatch(brokerAuthority.getAuthority()::equalsIgnoreCase)) {
       String proxySSLSubjectDN = request.getHeader(subjectDNProxyHeader);
       if (proxySSLSubjectDN != null) {
         Matcher matcher = subjectPrincipalRegex.matcher(proxySSLSubjectDN);
@@ -57,11 +57,10 @@ public class ProxyEnabledX509AuthenticationFilter extends X509AuthenticationFilt
           finalAuth = authenticationManager
                .authenticate(new PreAuthenticatedAuthenticationToken(proxyPrincipal,
                                                                      finalAuth.getCredentials()));
+          super.successfulAuthentication(request, response, finalAuth);
         }
       }
     }
-
-    super.successfulAuthentication(request, response, finalAuth);
   }
 
   public void setAuthenticationManager(final AuthenticationManager authenticationManager) {

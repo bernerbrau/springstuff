@@ -96,7 +96,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     http.apply(new ProxyEnabledX509Configurer<>())
         .subjectDNProxyHeader("X-SSL-Client-Cert-Subject")
         .subjectPrincipalRegex("CN=(.*?),")
-        .brokerAuthority("authenticationbroker");
+        .brokerAuthority(DefinedAuthority.AUTHENTICATION_BROKER);
 
     http.anonymous().authorities("anon");
 

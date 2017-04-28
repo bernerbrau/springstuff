@@ -19,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,12 +34,13 @@ import javax.servlet.http.HttpServletRequest;
 
 public final class ProxyEnabledX509Configurer<H extends HttpSecurityBuilder<H>> extends
 		AbstractHttpConfigurer<ProxyEnabledX509Configurer<H>, H> {
-	private ProxyEnabledX509AuthenticationFilter x509AuthenticationFilter;
-	private AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> authenticationUserDetailsService;
-	private AuthenticationDetailsSource<HttpServletRequest, PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails> authenticationDetailsSource;
-	private String subjectPrincipalRegex;
-	private String subjectDNProxyHeader;
-	private String brokerAuthority;
+	private ProxyEnabledX509AuthenticationFilter                                                                       x509AuthenticationFilter;
+	private AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken>                                      authenticationUserDetailsService;
+	private AuthenticationDetailsSource<HttpServletRequest, PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails>authenticationDetailsSource;
+
+	private String           subjectPrincipalRegex;
+	private String           subjectDNProxyHeader;
+	private GrantedAuthority brokerAuthority;
 
 	public ProxyEnabledX509Configurer() {
 	}
@@ -76,7 +78,7 @@ public final class ProxyEnabledX509Configurer<H extends HttpSecurityBuilder<H>> 
 		return this;
 	}
 
-	public ProxyEnabledX509Configurer<H> brokerAuthority(String brokerAuthority) {
+	public ProxyEnabledX509Configurer<H> brokerAuthority(GrantedAuthority brokerAuthority) {
 		this.brokerAuthority = brokerAuthority;
 		return this;
 	}
