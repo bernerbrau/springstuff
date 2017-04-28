@@ -102,7 +102,7 @@ public class User extends ResourceSupport implements UserDetails
 
     @JsonIgnore
     public boolean isConfigurableByUserAdmin() {
-        return authorities.stream()
+        return !authorities.isEmpty() && authorities.stream()
             .allMatch(DefinedAuthority::isAssignableByUserAdmin);
     }
 }

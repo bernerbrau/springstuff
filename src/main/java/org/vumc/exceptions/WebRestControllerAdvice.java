@@ -8,11 +8,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-//import org.vumc.exceptions.BadCredentialsException;
-//import org.vumc.exceptions.ExceptionResponseMsg;
-
-
-
 @RestControllerAdvice
 public class WebRestControllerAdvice {
 
@@ -29,6 +24,11 @@ public class WebRestControllerAdvice {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ExceptionResponseMsg> customExceptionResponseMsg(AuthenticationException ex) {
         return new ExceptionResponseMsg(HttpStatus.UNAUTHORIZED,"Internal authentication failure. Please contact VHAN support.", ex.getMessage()).toResponseEntity();
+    }
+
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<ExceptionResponseMsg> customExceptionResponseMsg(Throwable ex) {
+        return new ExceptionResponseMsg(HttpStatus.INTERNAL_SERVER_ERROR,"An unexpected error occurred. Please contact VHAN support.", ex.getMessage()).toResponseEntity();
     }
 
 }
