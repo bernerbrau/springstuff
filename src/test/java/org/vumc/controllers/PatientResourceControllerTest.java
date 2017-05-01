@@ -14,7 +14,7 @@ import org.springframework.integration.channel.QueueChannel;
 import org.vumc.model.Patient;
 import org.vumc.repository.PatientRepository;
 import org.vumc.transformations.c32.PatientC32ConverterConfig;
-import org.vumc.transformations.c32.TestConfig;
+import org.vumc.config.TestConfig;
 
 import javax.xml.transform.Transformer;
 import java.util.Base64;
@@ -30,10 +30,9 @@ import static org.mockito.Mockito.mock;
 
 public class PatientResourceControllerTest
 {
-  private static final AtomicLong SEQ            = new AtomicLong(0);
-  private static final String     SIMPLE_WRAPPER =
+  private static final String SIMPLE_WRAPPER =
       "<x:Document xmlns:x=\"urn:ihe:iti:xds-b:2007\">%s</x:Document>";
-  private static final String     SIMPLE_DOC =
+  private static final String SIMPLE_DOC              =
       "<ClinicalDocument xmlns=\"urn:hl7-org:v3\">\n" +
       "    <recordTarget>\n" +
       "        <patientRole>\n" +
@@ -50,7 +49,7 @@ public class PatientResourceControllerTest
       "        </patientRole>\n" +
       "    </recordTarget>\n" +
       "</ClinicalDocument>\n";
-  private static final String     DOC_WITH_NAME_FALLBACK =
+  private static final String DOC_WITH_NO_FAMILY_NAME =
       "<ClinicalDocument xmlns=\"urn:hl7-org:v3\">\n" +
       "    <recordTarget>\n" +
       "        <patientRole>\n" +
@@ -74,6 +73,8 @@ public class PatientResourceControllerTest
   @Before
   public void setUp() throws Exception
   {
+    AtomicLong sequence = new AtomicLong(0);
+
     repoBackingMap = new HashMap<>();
     channel = new QueueChannel();
 
@@ -84,7 +85,7 @@ public class PatientResourceControllerTest
         .willAnswer(i ->
         {
           Patient p = i.getArgument(0);
-          p.setId(SEQ.getAndIncrement());
+          p.setId(sequence.getAndIncrement());
           repoBackingMap.put(p.getId(), p);
           return p;
         });
@@ -120,6 +121,7 @@ public class PatientResourceControllerTest
 
     assertSame(dbPatient, msgPatient);
 
+    assertEquals("012345678", dbPatient.getPatientId());
     assertEquals("BIRD", dbPatient.getName().getFamily());
     assertEquals("BIG", dbPatient.getName().getGiven());
     assertEquals("ESQ", dbPatient.getName().getSuffix());
@@ -140,6 +142,7 @@ public class PatientResourceControllerTest
 
     assertSame(dbPatient, msgPatient);
 
+    assertEquals("012345678", dbPatient.getPatientId());
     assertEquals("BIRD", dbPatient.getName().getFamily());
     assertEquals("BIG", dbPatient.getName().getGiven());
     assertEquals("ESQ", dbPatient.getName().getSuffix());
@@ -150,7 +153,7 @@ public class PatientResourceControllerTest
   @Test
   public void testFallbackName() throws Exception
   {
-    String payload = DOC_WITH_NAME_FALLBACK;
+    String payload = DOC_WITH_NO_FAMILY_NAME;
 
     mController.postC32Document(payload);
 

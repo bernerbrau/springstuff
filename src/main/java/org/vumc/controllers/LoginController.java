@@ -38,10 +38,10 @@ public class LoginController
               .setAuthentication(
                       authManager.authenticate(
                               new UsernamePasswordAuthenticationToken(
-                                      credentials.username,
-                                      credentials.password)));
+                                      credentials.getUsername(),
+                                      credentials.getPassword())));
 
-      LOGGER.info("User {} logged in.", credentials.username);
+      LOGGER.info("User {} logged in.", credentials.getUsername());
   }
 
 }

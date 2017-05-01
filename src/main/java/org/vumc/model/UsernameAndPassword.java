@@ -9,6 +9,36 @@ package org.vumc.model;
 
 public class UsernameAndPassword
 {
-  public String username;
-  public String password;
+  private String username;
+  private String password;
+
+  public UsernameAndPassword()
+  {
+  }
+
+  public UsernameAndPassword(final String inUsername, final String inPassword)
+  {
+    username = inUsername;
+    password = inPassword;
+  }
+
+  public String getUsername()
+  {
+    return username;
+  }
+
+  public void setUsername(final String inUsername)
+  {
+    username = inUsername;
+  }
+
+  public String getPassword()
+  {
+    return password;
+  }
+
+  public void setPassword(final String inPassword)
+  {
+    password = inPassword;
+  }
 }

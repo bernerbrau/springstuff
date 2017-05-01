@@ -2,6 +2,7 @@ package org.vumc.transformations.c32;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.vumc.config.TestConfig;
 import org.vumc.model.Patient;
 
 import java.time.ZonedDateTime;

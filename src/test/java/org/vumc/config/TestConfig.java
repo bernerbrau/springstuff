@@ -5,7 +5,7 @@
  *
  * This code is copyright (c) 2017 Vanderbilt University Medical Center
  */
-package org.vumc.transformations.c32;
+package org.vumc.config;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -27,4 +27,5 @@ public class TestConfig
                   )
               );
   }
+
 }

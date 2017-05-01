@@ -27,14 +27,12 @@ public enum DefinedAuthority implements GrantedAuthority
   SYSTEM("system",false);
 
   public final String authority;
-  public final String hasAuthority;
   public final boolean assignableByUserAdmin;
 
   DefinedAuthority(final String inAuthority,
                    final boolean assignableByUserAdmin)
   {
     this.authority = inAuthority;
-    this.hasAuthority = "hasAuthority('" + inAuthority + "')";
     this.assignableByUserAdmin = assignableByUserAdmin;
   }
 
