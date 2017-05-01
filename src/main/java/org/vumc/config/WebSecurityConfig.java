@@ -150,11 +150,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
           .authorities(DefinedAuthority.USER_ADMIN.getAuthority())
           .and()
         .withUser("continuumdev")
-          .password("")
+          .password("0")
           .authorities(DefinedAuthority.AUTHENTICATION_BROKER.getAuthority())
         .and()
         .withUser("vaadevmessaging.orionhealthcloud.com")
-          .password("")
+          .password("0")
           .authorities(DefinedAuthority.PATIENT_SOURCE.getAuthority());
     }
   }

@@ -1,16 +1,14 @@
 package org.vumc.transformations.c32;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
-import org.springframework.context.ApplicationContext;
 import org.vumc.model.Patient;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class PatientC32ConverterTest
 {
@@ -21,9 +19,7 @@ public class PatientC32ConverterTest
   @Before
   public void setUp() throws Exception
   {
-
-    ApplicationContext ctx = new AnnotationConfigEmbeddedWebApplicationContext();
-    transformer = new PatientC32DocumentTransformer(ctx);
+    transformer = new PatientC32DocumentTransformer(new TestConfig().patientC32DocumentTransformer());
 
     CCDXslNamespaceXPathSource xPathSource = new CCDXslNamespaceXPathSource();
 

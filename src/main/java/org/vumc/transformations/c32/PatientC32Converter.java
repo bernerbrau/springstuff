@@ -7,12 +7,10 @@
  */
 package org.vumc.transformations.c32;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.google.common.base.Charsets;
 import org.vumc.model.Patient;
 import org.w3c.dom.Node;
 
-import com.google.common.base.Charsets;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,15 +18,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-@Component
 public class PatientC32Converter
 {
   private final PatientDocumentC32Finder finder;
   private final PatientC32Extractor extractor;
   private final DocumentBuilder docBuilder;
 
-  @Autowired
-  public PatientC32Converter(final PatientDocumentC32Finder inFinder,
+  PatientC32Converter(final PatientDocumentC32Finder inFinder,
                              final PatientC32Extractor inExtractor)
       throws ParserConfigurationException
   {
@@ -49,7 +45,7 @@ public class PatientC32Converter
     }
   }
 
-  public Patient convert(InputStream xmlAsStream, String xmlAsString) {
+  private Patient convert(InputStream xmlAsStream, String xmlAsString) {
     try
     {
       Node c32Element = finder.findC32Document(docBuilder.parse(xmlAsStream));

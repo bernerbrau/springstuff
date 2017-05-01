@@ -178,6 +178,9 @@ dependencies {
         exclude module: 'log4j-over-slf4j'
     }
 
+    testCompile 'info.solidsoft.mockito:mockito-java8:2.0.1'
+    testCompile 'org.mockito:mockito-core:2.2.5'
+
 }
 
 compileJava.dependsOn(processResources)

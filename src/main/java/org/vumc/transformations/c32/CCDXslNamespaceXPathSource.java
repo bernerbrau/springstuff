@@ -7,7 +7,6 @@
  */
 package org.vumc.transformations.c32;
 
-import org.springframework.stereotype.Component;
 import org.springframework.util.xml.SimpleNamespaceContext;
 import org.vumc.transformations.xml.XPathSource;
 
@@ -18,7 +17,6 @@ import javax.xml.xpath.XPathFactory;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-@Component
 class CCDXslNamespaceXPathSource implements XPathSource
 {
   private final Map<String, XPathExpression> xPathCache = new WeakHashMap<>();

@@ -7,30 +7,26 @@
  */
 package org.vumc.transformations.c32;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import fj.function.TryEffect0;
+import fj.function.TryEffect1;
 import org.vumc.model.Patient;
 import org.vumc.model.PatientName;
 import org.vumc.transformations.xml.XPathSource;
 import org.w3c.dom.Node;
 
-import fj.function.TryEffect0;
-import fj.function.TryEffect1;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Component
 class PatientC32Extractor
 {
   private final XPathSource                   xPath;
   private final PatientC32DocumentTransformer transformer;
 
-  @Autowired
-  public PatientC32Extractor(final XPathSource xPath,
-                             final PatientC32DocumentTransformer inTransformer)
+  PatientC32Extractor(final XPathSource xPath,
+                      final PatientC32DocumentTransformer inTransformer)
   {
     this.xPath = xPath;
     transformer = inTransformer;
