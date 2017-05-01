@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
@@ -88,6 +88,8 @@ public class PatientResourceControllerTest
           repoBackingMap.put(p.getId(), p);
           return p;
         });
+    given(fakeRepository.findOne(anyLong()))
+        .willAnswer(i -> repoBackingMap.get(i.getArgument(0)));
 
     mController = new PatientResourceController(
        new PatientC32ConverterConfig()
@@ -162,4 +164,21 @@ public class PatientResourceControllerTest
     assertEquals("M", dbPatient.getGender());
     assertEquals(payload, dbPatient.getRawMessage());
   }
+
+
+  @Test
+  public void testBody() throws Exception
+  {
+    mController.postC32Document(SIMPLE_DOC);
+
+    assertEquals(1, repoBackingMap.size());
+    Patient dbPatient = repoBackingMap.values().iterator().next();
+
+    assertNotNull(dbPatient.getBody());
+    assertFalse(dbPatient.getBody().isEmpty());
+
+    String body = mController.getHtml(dbPatient.getId()).getBody();
+    assertEquals(dbPatient.getBody(), body);
+  }
+
 }
