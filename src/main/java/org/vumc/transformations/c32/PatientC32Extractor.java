@@ -9,6 +9,7 @@ package org.vumc.transformations.c32;
 
 import fj.function.TryEffect0;
 import fj.function.TryEffect1;
+import org.hibernate.engine.jdbc.NonContextualLobCreator;
 import org.vumc.model.Patient;
 import org.vumc.model.PatientName;
 import org.vumc.transformations.xml.XPathSource;
@@ -38,6 +39,7 @@ class PatientC32Extractor
       final Patient patient = new Patient();
       doInNode(c32Element, "/n1:ClinicalDocument/n1:recordTarget/n1:patientRole", roleNode -> {
           doForString(roleNode, "./n1:id/@extension", patient::setPatientId);
+          doForString(roleNode, "./n1:id/@assigningAuthorityName", patient::setIdAssigningAuthority);
           doInNode(roleNode, "./n1:patient", patientNode -> {
               doInNode(patientNode, "./n1:name", nameNode -> {
                 final PatientName name = new PatientName();
@@ -57,8 +59,8 @@ class PatientC32Extractor
                   dob -> patient.setDob(LocalDate.parse(dob, DateTimeFormatter.ofPattern("yyyyMMdd"))));
           });
       });
-      patient.setBody(transformer.c32DocumentToHTML(c32Element));
-      patient.setRawMessage(xmlAsString);
+      patient.setBody(NonContextualLobCreator.INSTANCE.createClob(transformer.c32DocumentToHTML(c32Element)));
+      patient.setRawMessage(NonContextualLobCreator.INSTANCE.createClob(xmlAsString));
       patient.setCreated(ZonedDateTime.now());
       return patient;
   }

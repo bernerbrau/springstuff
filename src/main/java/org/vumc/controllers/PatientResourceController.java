@@ -24,6 +24,8 @@ import org.vumc.transformations.c32.PatientC32Converter;
 
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
+import java.io.Reader;
+import java.sql.SQLException;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -68,11 +70,12 @@ public class PatientResourceController
   @AllowedAuthorities(DefinedAuthority.PROVIDER)
   @RequestMapping(path = "{id}/body.html", method = RequestMethod.GET,
                   produces = MediaType.TEXT_HTML_VALUE)
-  public ResponseEntity<String> getHtml(@PathVariable("id") long id) {
+  public ResponseEntity<Reader> getHtml(@PathVariable("id") long id) throws IOException,
+                                                                            SQLException {
     Patient patient = patientRepository.findOne(id);
     if (patient != null)
     {
-      String body = patient.body;
+      Reader body = patient.getBody().getCharacterStream();
       if (body != null)
       {
         LOGGER.info("Presented patient with id {} to user.", id);

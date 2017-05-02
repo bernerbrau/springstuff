@@ -135,7 +135,7 @@ public class JdbcPubSubChannel extends PublishSubscribeChannel
     return true;
   }
 
-  @Scheduled(fixedDelay = 5000)
+  //@Scheduled(fixedDelay = 5000)
   @Transactional
   protected synchronized void poll()
   {

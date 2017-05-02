@@ -8,15 +8,17 @@
 package org.vumc.controllers;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.integration.channel.QueueChannel;
+import org.vumc.config.TestConfig;
 import org.vumc.model.Patient;
 import org.vumc.repository.PatientRepository;
 import org.vumc.transformations.c32.PatientC32ConverterConfig;
-import org.vumc.config.TestConfig;
 
 import javax.xml.transform.Transformer;
+import java.io.Reader;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -122,11 +124,12 @@ public class PatientResourceControllerTest
     assertSame(dbPatient, msgPatient);
 
     assertEquals("012345678", dbPatient.getPatientId());
+    assertEquals("Vanderbilt University Medical Center", dbPatient.getIdAssigningAuthority());
     assertEquals("BIRD", dbPatient.getName().getFamily());
     assertEquals("BIG", dbPatient.getName().getGiven());
     assertEquals("ESQ", dbPatient.getName().getSuffix());
     assertEquals("M", dbPatient.getGender());
-    assertEquals(payload, dbPatient.getRawMessage());
+    assertEquals(payload, CharStreams.toString(dbPatient.getRawMessage().getCharacterStream()));
   }
 
   @Test
@@ -143,11 +146,12 @@ public class PatientResourceControllerTest
     assertSame(dbPatient, msgPatient);
 
     assertEquals("012345678", dbPatient.getPatientId());
+    assertEquals("Vanderbilt University Medical Center", dbPatient.getIdAssigningAuthority());
     assertEquals("BIRD", dbPatient.getName().getFamily());
     assertEquals("BIG", dbPatient.getName().getGiven());
     assertEquals("ESQ", dbPatient.getName().getSuffix());
     assertEquals("M", dbPatient.getGender());
-    assertEquals(payload, dbPatient.getRawMessage());
+    assertEquals(payload, CharStreams.toString(dbPatient.getRawMessage().getCharacterStream()));
   }
 
   @Test
@@ -165,7 +169,7 @@ public class PatientResourceControllerTest
 
     assertEquals("BIG ESQ", dbPatient.getName().getName());
     assertEquals("M", dbPatient.getGender());
-    assertEquals(payload, dbPatient.getRawMessage());
+    assertEquals(payload, CharStreams.toString(dbPatient.getRawMessage().getCharacterStream()));
   }
 
 
@@ -178,10 +182,11 @@ public class PatientResourceControllerTest
     Patient dbPatient = repoBackingMap.values().iterator().next();
 
     assertNotNull(dbPatient.getBody());
-    assertFalse(dbPatient.getBody().isEmpty());
 
-    String body = mController.getHtml(dbPatient.getId()).getBody();
-    assertEquals(dbPatient.getBody(), body);
+    Reader dbBody = mController.getHtml(dbPatient.getId()).getBody();
+    Reader controllerBody = mController.getHtml(dbPatient.getId()).getBody();
+
+    assertSame(dbBody, controllerBody);
   }
 
 }

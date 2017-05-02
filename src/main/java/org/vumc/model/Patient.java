@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.MoreObjects;
 
 import javax.persistence.*;
+import java.sql.Clob;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
@@ -24,27 +25,29 @@ public class Patient
   @Id
   @GeneratedValue(strategy=GenerationType.SEQUENCE,generator="PATIENT_SEQ")
   @SequenceGenerator(name="PATIENT_SEQ",sequenceName="PATIENT_SEQ",allocationSize=1)
-  public long          id;
+  private long          id;
 
   @Column(nullable = false)
-  public ZonedDateTime created;
+  private ZonedDateTime created;
 
-  @Column(length=30)
-  public String      patientId;
+  @Column(length=30, nullable=false)
+  private String      patientId;
+  @Column(length=100, nullable=false)
+  private String      idAssigningAuthority;
   @Embedded
-  public PatientName name = new PatientName();
+  private PatientName name = new PatientName();
   @Column(length=1)
-  public String      gender;
-
-  public LocalDate   dob;
-
-  @Lob
-  @JsonIgnore
-  public String body;
+  private String      gender;
+  @Column
+  private LocalDate   dob;
 
   @Lob
   @JsonIgnore
-  public String rawMessage;
+  private Clob body;
+
+  @Lob
+  @JsonIgnore
+  private Clob rawMessage;
 
   @Override
   public String toString()
@@ -53,6 +56,7 @@ public class Patient
                .add("id", id)
                .add("created", created)
                .add("patientId", patientId)
+               .add("idAssigningAuthority", idAssigningAuthority)
                .toString();
   }
 
@@ -86,6 +90,16 @@ public class Patient
     patientId = inPatientId;
   }
 
+  public String getIdAssigningAuthority()
+  {
+    return idAssigningAuthority;
+  }
+
+  public void setIdAssigningAuthority(final String inIdAssigningAuthority)
+  {
+    idAssigningAuthority = inIdAssigningAuthority;
+  }
+
   public PatientName getName()
   {
     return name;
@@ -116,23 +130,22 @@ public class Patient
     dob = inDob;
   }
 
-  public String getBody()
+  public Clob getBody()
   {
     return body;
   }
 
-  public void setBody(final String inBody)
+  public void setBody(final Clob inBody)
   {
     body = inBody;
   }
 
-  public String getRawMessage() {
+  public Clob getRawMessage() {
     return rawMessage;
   }
 
-  public void setRawMessage(final String inRawMessage) {
+  public void setRawMessage(final Clob inRawMessage) {
     rawMessage = inRawMessage;
   }
-
 
 }

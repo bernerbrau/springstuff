@@ -14,13 +14,13 @@ import javax.persistence.Column;
 public class PatientName
 {
   @Column(length=30)
-  public String family;
+  private String family;
   @Column(length=30)
-  public String given;
+  private String given;
   @Column(length=10)
-  public String suffix;
+  private String suffix;
   @Column(length=100)
-  public String name;
+  private String name;
 
   @Override
   public String toString()

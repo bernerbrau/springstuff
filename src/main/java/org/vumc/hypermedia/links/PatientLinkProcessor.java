@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 import org.vumc.controllers.PatientResourceController;
 import org.vumc.model.Patient;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -23,12 +26,19 @@ public class PatientLinkProcessor implements ResourceProcessor<Resource<Patient>
   public Resource<Patient> process(final Resource<Patient> resource)
   {
     Patient patient = resource.getContent();
-    if (patient.body != null && !patient.body.isEmpty())
+    try
     {
-      resource.add(linkTo(
-          methodOn(PatientResourceController.class)
-              .getHtml(patient.id))
-                       .withRel("content"));
+      if (patient.getBody() != null && patient.getBody().length() != 0)
+      {
+        resource.add(linkTo(
+            methodOn(PatientResourceController.class)
+                .getHtml(patient.getId()))
+                         .withRel("content"));
+      }
+    }
+    catch (IOException | SQLException inE)
+    {
+      // If error reading CLOB stream, don't present a link.
     }
     return resource;
   }

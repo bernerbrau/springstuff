@@ -1,5 +1,6 @@
 package org.vumc.transformations.c32;
 
+import com.google.common.io.CharStreams;
 import org.junit.Before;
 import org.junit.Test;
 import org.vumc.config.TestConfig;
@@ -15,7 +16,6 @@ public class PatientC32ConverterTest
 {
   private PatientC32Converter converter;
   private PatientC32DocumentTransformer transformer;
-
 
   @Before
   public void setUp() throws Exception
@@ -35,8 +35,8 @@ public class PatientC32ConverterTest
 
     Patient patient = converter.convert(sampleMessage());
 
-    assertEquals(sampleMessage_PatientBody(), patient.getBody().replaceAll("(\\r)", ""));
-    assertEquals(sampleMessage(), patient.getRawMessage());
+    assertEquals(sampleMessage_PatientBody(), CharStreams.toString(patient.getBody().getCharacterStream()).replaceAll("(\\r)", ""));
+    assertEquals(sampleMessage(), CharStreams.toString(patient.getRawMessage().getCharacterStream()));
     assertEquals("HOOT", patient.getName().getFamily());
     assertEquals("SCOOT", patient.getName().getGiven());
     assertEquals("Full name is not populated currently", null, patient.getName().getName());
@@ -52,8 +52,8 @@ public class PatientC32ConverterTest
   public void canParseMessageWithEncodedBody() throws Exception
   {
     Patient patient = converter.convert(sampleMessage2());
-    assertEquals(sampleMessage_PatientBody2(), patient.getBody().replaceAll("(\\r)", ""));
-    assertEquals(sampleMessage2(), patient.getRawMessage());
+    assertEquals(sampleMessage_PatientBody2(), CharStreams.toString(patient.getBody().getCharacterStream()).replaceAll("(\\r)", ""));
+    assertEquals(sampleMessage2(), CharStreams.toString(patient.getRawMessage().getCharacterStream()));
     assertEquals("CADENCE", patient.getName().getFamily());
     assertEquals("JOANIE", patient.getName().getGiven());
     assertEquals("Full name is not populated currently", null, patient.getName().getName());
