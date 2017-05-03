@@ -39,7 +39,7 @@ class PatientC32Extractor
       final Patient patient = new Patient();
       doInNode(c32Element, "/n1:ClinicalDocument/n1:recordTarget/n1:patientRole", roleNode -> {
           doForString(roleNode, "./n1:id/@extension", patient::setPatientId);
-          doForString(roleNode, "./n1:id/@assigningAuthorityName", patient::setIdAssigningAuthority);
+          doForString(roleNode, "./n1:id/@*[name()='assigningAuthorityName' or name()='root']", patient::setIdAssigningAuthority);
           doInNode(roleNode, "./n1:patient", patientNode -> {
               doInNode(patientNode, "./n1:name", nameNode -> {
                 final PatientName name = new PatientName();

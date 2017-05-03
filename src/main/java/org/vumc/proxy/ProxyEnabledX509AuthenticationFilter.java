@@ -61,6 +61,10 @@ public class ProxyEnabledX509AuthenticationFilter extends X509AuthenticationFilt
         }
       }
     }
+    else
+    {
+      super.successfulAuthentication(request, response, finalAuth);
+    }
   }
 
   public void setAuthenticationManager(final AuthenticationManager authenticationManager) {

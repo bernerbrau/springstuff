@@ -7,6 +7,7 @@
  */
 package org.vumc.controllers;
 
+import com.google.common.io.CharStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class PatientResourceController
   }
 
   @AllowedAuthorities(DefinedAuthority.PATIENT_SOURCE)
-  @RequestMapping(path = "c32", method = RequestMethod.POST,
+  @PostMapping(path = "c32",
                   consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_XML_VALUE })
   public void postC32Document(@RequestBody String inC32Request)
       throws TransformerException, IOException
@@ -68,9 +69,8 @@ public class PatientResourceController
   }
 
   @AllowedAuthorities(DefinedAuthority.PROVIDER)
-  @RequestMapping(path = "{id}/body.html", method = RequestMethod.GET,
-                  produces = MediaType.TEXT_HTML_VALUE)
-  public ResponseEntity<Reader> getHtml(@PathVariable("id") long id) throws IOException,
+  @GetMapping(path = "{id}/body.html", produces = MediaType.TEXT_HTML_VALUE)
+  public ResponseEntity<String> getHtml(@PathVariable("id") long id) throws IOException,
                                                                             SQLException {
     Patient patient = patientRepository.findOne(id);
     if (patient != null)
@@ -79,7 +79,7 @@ public class PatientResourceController
       if (body != null)
       {
         LOGGER.info("Presented patient with id {} to user.", id);
-        return ResponseEntity.ok(body);
+        return ResponseEntity.ok(CharStreams.toString(body));
       }
     }
     LOGGER.info("Patient with id {} not found.", id);
