@@ -1,0 +1,10 @@
+grant select, insert, update, delete on CONTINUUMADM.USERS to CONTINUUMAPP;
+grant select, insert, update, delete on CONTINUUMADM.USERS to CONTINUUMOASAPP;
+grant select, insert, update, delete on CONTINUUMADM.AUTHORITIES to CONTINUUMAPP;
+grant select, insert, update, delete on CONTINUUMADM.AUTHORITIES to CONTINUUMOASAPP;
+grant select, insert, update, delete on CONTINUUMADM.MESSAGE to CONTINUUMAPP;
+grant select, insert, update, delete on CONTINUUMADM.MESSAGE to CONTINUUMOASAPP;
+grant select, insert, update, delete on CONTINUUMADM.MESSAGE_RECEIPT to CONTINUUMAPP;
+grant select, insert, update, delete on CONTINUUMADM.MESSAGE_RECEIPT to CONTINUUMOASAPP;
+grant select, insert, update, delete on CONTINUUMADM.PATIENT to CONTINUUMAPP;
+grant select, insert, update, delete on CONTINUUMADM.PATIENT to CONTINUUMOASAPP;
