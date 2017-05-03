@@ -18,7 +18,6 @@ import org.vumc.repository.PatientRepository;
 import org.vumc.transformations.c32.PatientC32ConverterConfig;
 
 import javax.xml.transform.Transformer;
-import java.io.Reader;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -183,10 +182,10 @@ public class PatientResourceControllerTest
 
     assertNotNull(dbPatient.getBody());
 
-    Reader dbBody = mController.getHtml(dbPatient.getId()).getBody();
-    Reader controllerBody = mController.getHtml(dbPatient.getId()).getBody();
+    String dbBody = mController.getHtml(dbPatient.getId()).getBody();
+    String controllerBody = mController.getHtml(dbPatient.getId()).getBody();
 
-    assertSame(dbBody, controllerBody);
+    assertEquals(dbBody, controllerBody);
   }
 
 }

@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @PostFilter("filterObject.isConfigurableByUserAdmin()")
-    public List<User> getUsers() throws Exception {
+    public List<User> getUsers() {
         LOGGER.info("Getting list of all users.");
         return userDetailsManager.findAllUsers()
                    .stream()
@@ -45,19 +45,20 @@ public class UserController {
     }
 
     @PostAuthorize("returnObject.isConfigurableByUserAdmin()")
-    public User getUser(String username) throws Exception {
+    public User getUser(String username) {
         LOGGER.info("Getting user {}", username);
-        return User.fromUserDetails(userDetailsManager.loadUserByUsername(username), false);
+        UserDetails userDetails = userDetailsManager.loadUserByUsername(username);
+        return userDetails == null ? null : User.fromUserDetails(userDetails, false);
     }
 
-    public void createNewUser(User userDetails) throws Exception {
+    public void createNewUser(User userDetails) {
         LOGGER.info("Creating New User {}", userDetails.getUsername());
         userDetails.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         userDetailsManager.createUser(userDetails);
     }
 
     @PreAuthorize("@userController.isConfigurableByUserAdmin(#username)")
-    public void updateUser(String username, User user) throws Exception {
+    public void updateUser(String username, User user) {
         LOGGER.info("Updating User {}", user.getUsername());
 
         UserDetails currentUser = userDetailsManager.loadUserByUsername(username);
@@ -75,7 +76,7 @@ public class UserController {
     }
 
     @PreAuthorize("@userController.isConfigurableByUserAdmin(#username)")
-    public void deleteUser(String username) throws Exception {
+    public void deleteUser(String username) {
         LOGGER.info("Deleting User {}", username);
 
         userDetailsManager.deleteUser(username);

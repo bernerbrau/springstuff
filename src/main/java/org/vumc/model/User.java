@@ -13,96 +13,125 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 public class User extends ResourceSupport implements UserDetails
 {
   private Collection<DefinedAuthority> authorities;
-  private String password;
-  private String username;
-  private boolean isAccountNonExpired;
-  private boolean isAccountNonLocked;
-  private boolean isCredentialsNonExpired;
-  private boolean isEnabled;
+  private String                       password;
+  private String                       username;
+  private boolean                      isAccountNonExpired;
+  private boolean                      isAccountNonLocked;
+  private boolean                      isCredentialsNonExpired;
+  private boolean                      isEnabled;
 
-  public void setAuthorities(Collection<DefinedAuthority> authorities) {
-        this.authorities = authorities;
-    }
+  public User() {}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public User(final String inUsername,
+              final String inPassword,
+              final Collection<DefinedAuthority> inAuthorities)
+  {
+    authorities = inAuthorities;
+    password = inPassword;
+    username = inUsername;
+    isEnabled = true;
+  }
 
-    public void setUsername(String username) {
-        this.username = username;
+  public static User fromUserDetails(UserDetails userDetails, boolean copyPassword)
+  {
+    User user = new User();
+    user.setUsername(userDetails.getUsername());
+    if (copyPassword)
+    {
+      user.setPassword(userDetails.getPassword());
     }
+    user.setAuthorities(DefinedAuthority.from(userDetails.getAuthorities()));
+    user.setEnabled(userDetails.isEnabled());
+    user.setAccountNonExpired(userDetails.isAccountNonExpired());
+    user.setAccountNonLocked(userDetails.isAccountNonLocked());
+    user.setCredentialsNonExpired(userDetails.isCredentialsNonExpired());
+    return user;
+  }
 
-    public void setAccountNonExpired(boolean accountNonExpired) {
-        isAccountNonExpired = accountNonExpired;
-    }
+  @Override
+  public Collection<DefinedAuthority> getAuthorities()
+  {
+    return authorities;
+  }
 
-    public void setAccountNonLocked(boolean accountNonLocked) {
-        isAccountNonLocked = accountNonLocked;
-    }
+  public void setAuthorities(Collection<DefinedAuthority> authorities)
+  {
+    this.authorities = authorities;
+  }
 
-    public void setCredentialsNonExpired(boolean credentialsNonExpired) {
-        isCredentialsNonExpired = credentialsNonExpired;
-    }
+  @Override
+  public String getPassword()
+  {
+    return password;
+  }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
+  public void setPassword(String password)
+  {
+    this.password = password;
+  }
 
-    @Override
-    public Collection<DefinedAuthority> getAuthorities() {
-        return authorities;
-    }
+  @Override
+  public String getUsername()
+  {
+    return username;
+  }
 
-    @Override
-    public String getPassword() {
-        return password;
-    }
+  public void setUsername(String username)
+  {
+    this.username = username;
+  }
 
-    @Override
-    public String getUsername() {
-        return username;
-    }
+  @Override
+  @JsonIgnore
+  public boolean isAccountNonExpired()
+  {
+    return isAccountNonExpired;
+  }
 
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonExpired() {
-        return isAccountNonExpired;
-    }
+  public void setAccountNonExpired(boolean accountNonExpired)
+  {
+    isAccountNonExpired = accountNonExpired;
+  }
 
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonLocked() {
-        return isAccountNonLocked;
-    }
+  @Override
+  @JsonIgnore
+  public boolean isAccountNonLocked()
+  {
+    return isAccountNonLocked;
+  }
 
-    @Override
-    @JsonIgnore
-    public boolean isCredentialsNonExpired() {
-        return isCredentialsNonExpired;
-    }
+  public void setAccountNonLocked(boolean accountNonLocked)
+  {
+    isAccountNonLocked = accountNonLocked;
+  }
 
-    @Override
-    public boolean isEnabled() {
-        return isEnabled;
-    }
+  @Override
+  @JsonIgnore
+  public boolean isCredentialsNonExpired()
+  {
+    return isCredentialsNonExpired;
+  }
 
-    public static User fromUserDetails(UserDetails userDetails, boolean copyPassword) {
-        User user = new User();
-        user.setUsername(userDetails.getUsername());
-        if (copyPassword) {
-            user.setPassword(userDetails.getPassword());
-        }
-        user.setAuthorities(DefinedAuthority.from(userDetails.getAuthorities()));
-        user.setEnabled(userDetails.isEnabled());
-        user.setAccountNonExpired(userDetails.isAccountNonExpired());
-        user.setAccountNonLocked(userDetails.isAccountNonLocked());
-        user.setCredentialsNonExpired(userDetails.isCredentialsNonExpired());
-        return user;
-    }
+  public void setCredentialsNonExpired(boolean credentialsNonExpired)
+  {
+    isCredentialsNonExpired = credentialsNonExpired;
+  }
 
-    @JsonIgnore
-    public boolean isConfigurableByUserAdmin() {
-        return !authorities.isEmpty() && authorities.stream()
-            .allMatch(DefinedAuthority::isAssignableByUserAdmin);
-    }
+  @Override
+  public boolean isEnabled()
+  {
+    return isEnabled;
+  }
+
+  public void setEnabled(boolean enabled)
+  {
+    isEnabled = enabled;
+  }
+
+  @JsonIgnore
+  public boolean isConfigurableByUserAdmin()
+  {
+    return !authorities.isEmpty() && authorities.stream()
+                                         .allMatch(DefinedAuthority::isAssignableByUserAdmin);
+  }
 }
