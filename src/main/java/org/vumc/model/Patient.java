@@ -7,16 +7,23 @@
  */
 package org.vumc.model;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.MoreObjects;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.SequenceGenerator;
 import java.sql.Clob;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Entity
 @JsonInclude(NON_NULL)
@@ -36,7 +43,7 @@ public class Patient
   private String      idAssigningAuthority;
   @Embedded
   private PatientName name = new PatientName();
-  @Column(length=1)
+  @Column(length=30)
   private String      gender;
   @Column
   private LocalDate   dob;

@@ -39,7 +39,7 @@ CREATE TABLE "CONTINUUMADM"."PATIENT"
   "ID_ASSIGNING_AUTHORITY" VARCHAR2(100 CHAR) NOT NULL ENABLE,
   "BODY"                   CLOB,
   "DOB"                    DATE,
-  "GENDER"                 VARCHAR2(1 CHAR),
+  "GENDER"                 VARCHAR2(30 CHAR),
   "FAMILY"                 VARCHAR2(30 CHAR),
   "GIVEN"                  VARCHAR2(30 CHAR),
   "SUFFIX"                 VARCHAR2(10 CHAR),
