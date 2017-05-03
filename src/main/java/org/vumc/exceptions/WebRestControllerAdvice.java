@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -19,6 +20,11 @@ public class WebRestControllerAdvice {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ExceptionResponseMsg> customExceptionResponseMsg(AccessDeniedException ex) {
         return new ExceptionResponseMsg(HttpStatus.FORBIDDEN,"The current user does not have sufficient privileges for the attempted resource or action.", ex.getMessage()).toResponseEntity();
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ExceptionResponseMsg> customExceptionResponseMsg(UsernameNotFoundException ex) {
+        return new ExceptionResponseMsg(HttpStatus.NOT_FOUND,"The requested user was not found.", ex.getMessage()).toResponseEntity();
     }
 
     @ExceptionHandler(AuthenticationException.class)

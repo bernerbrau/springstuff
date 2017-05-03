@@ -10,7 +10,7 @@ package org.vumc.hypermedia.assembler;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.vumc.controllers.UserController;
+import org.vumc.controllers.UserResourceController;
 import org.vumc.model.User;
 
 @Component
@@ -18,7 +18,7 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserDetails,
 {
   public UserResourceAssembler()
   {
-    super(UserController.class, User.class);
+    super(UserResourceController.class, User.class);
   }
 
   @Override
@@ -30,6 +30,13 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserDetails,
   @Override
   protected User instantiateResource(final UserDetails entity)
   {
-    return User.fromUserDetails(entity, false);
+    if (entity instanceof User)
+    {
+      return (User) entity;
+    }
+    else
+    {
+      return User.fromUserDetails(entity, false);
+    }
   }
 }
