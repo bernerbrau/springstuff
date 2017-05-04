@@ -139,6 +139,63 @@ public class UserResourceControllerTest
     assertEquals(URL_ROOT + CONTEXT_PATH + "/api/users/testadmin", controllerUser2.getLink("self").getHref());
   }
 
+
+  @Test
+  public void getUsersReturnsAllUsers() throws Exception {
+    User user1 = new User(
+       "testuser",
+       encoder.encode("testpass"),
+       Collections.singletonList(DefinedAuthority.PROVIDER));
+    User user2 = new User(
+       "testadmin",
+       encoder.encode("testpass2"),
+       Collections.singletonList(DefinedAuthority.USER_ADMIN));
+
+    manager.createUser(user1);
+    manager.createUser(user2);
+
+    Resources<User> users = resourceController.getUsers();
+
+    assertEquals(2, Iterables.size(users));
+    assertTrue(
+        Streams.stream(users).anyMatch(u ->
+              u.getUsername().equals(user1.getUsername())
+              && u.getPassword() == null
+              && u.getAuthorities().equals(user1.getAuthorities())));
+    assertTrue(
+        Streams.stream(users).anyMatch(u ->
+              u.getUsername().equals(user2.getUsername())
+              && u.getPassword() == null
+              && u.getAuthorities().equals(user2.getAuthorities())));
+  }
+
+  @Test
+  public void getUserReturnsUserByName() throws Exception {
+    User user1 = new User(
+       "testuser",
+       encoder.encode("testpass"),
+       Collections.singletonList(DefinedAuthority.PROVIDER));
+    User user2 = new User(
+       "testadmin",
+       encoder.encode("testpass2"),
+       Collections.singletonList(DefinedAuthority.USER_ADMIN));
+
+    manager.createUser(user1);
+    manager.createUser(user2);
+
+    User controllerUser1 = resourceController.getUser("testuser");
+    User controllerUser2 = resourceController.getUser("testadmin");
+
+    assertEquals(user1.getUsername(), controllerUser1.getUsername());
+    assertNull(controllerUser1.getPassword());
+    assertEquals(user1.getAuthorities(), controllerUser1.getAuthorities());
+
+    assertEquals(user2.getUsername(), controllerUser2.getUsername());
+    assertNull(controllerUser1.getPassword());
+    assertEquals(user2.getAuthorities(), controllerUser2.getAuthorities());
+  }
+
+
   @Test
   public void createUserCreatesEnabledUserWithEncodedPassword() throws Exception {
     User user =

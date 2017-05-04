@@ -46,7 +46,7 @@ public class UserController {
                    .collect(Collectors.toList());
     }
 
-    @PostAuthorize("returnObject.isConfigurableByUserAdmin()")
+    @PostAuthorize("@userController.isConfigurableByUserAdmin(#username)")
     public User getUser(String username) {
         LOGGER.info("Getting user {}", username);
         if (userDetailsManager.userExists(username)) {
@@ -92,9 +92,13 @@ public class UserController {
         userDetailsManager.deleteUser(username);
     }
 
-    public boolean isConfigurableByUserAdmin(String username) {
-        return ((User)userDetailsManager.loadUserByUsername(username))
-                   .isConfigurableByUserAdmin();
+    public boolean isConfigurableByUserAdmin(String username)
+    {
+        return !userDetailsManager.userExists(username) ||
+               User.fromUserDetails(
+                   userDetailsManager.loadUserByUsername(username),
+                   false
+               ).isConfigurableByUserAdmin();
     }
 
 }

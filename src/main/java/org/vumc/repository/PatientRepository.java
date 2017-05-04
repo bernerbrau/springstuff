@@ -17,11 +17,11 @@ import org.vumc.security.annotations.AllowedAuthorities;
 import java.util.Collection;
 
 @RepositoryRestResource
-@RepositoryDefinition(domainClass = Patient.class, idClass = Long.class)
+@RepositoryDefinition(domainClass = Patient.class, idClass = long.class)
 public interface PatientRepository
 {
   @AllowedAuthorities(DefinedAuthority.PROVIDER)
-  Patient findOne(Long inId);
+  Patient findOne(long inId);
 
   @AllowedAuthorities(DefinedAuthority.PROVIDER)
   Collection<Patient> findAll();

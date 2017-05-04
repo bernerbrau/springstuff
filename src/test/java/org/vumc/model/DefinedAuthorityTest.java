@@ -31,7 +31,6 @@ public class DefinedAuthorityTest
     assertThat("useradmin", equalTo(DefinedAuthority.USER_ADMIN.getAuthority()));
     assertThat("authenticationbroker", equalTo(DefinedAuthority.AUTHENTICATION_BROKER.getAuthority()));
     assertThat("patientsource", equalTo(DefinedAuthority.PATIENT_SOURCE.getAuthority()));
-    assertThat("system", equalTo(DefinedAuthority.SYSTEM.getAuthority()));
   }
 
   @Test
@@ -41,7 +40,6 @@ public class DefinedAuthorityTest
     assertThat(DefinedAuthority.USER_ADMIN, equalTo(DefinedAuthority.fromString("useradmin")));
     assertThat(DefinedAuthority.AUTHENTICATION_BROKER, equalTo(DefinedAuthority.fromString("authenticationbroker")));
     assertThat(DefinedAuthority.PATIENT_SOURCE, equalTo(DefinedAuthority.fromString("patientsource")));
-    assertThat(DefinedAuthority.SYSTEM, equalTo(DefinedAuthority.fromString("system")));
   }
 
   @Test
@@ -57,7 +55,6 @@ public class DefinedAuthorityTest
     assertThat(DefinedAuthority.USER_ADMIN, equalTo(DefinedAuthority.from(new SimpleGrantedAuthority("useradmin"))));
     assertThat(DefinedAuthority.AUTHENTICATION_BROKER, equalTo(DefinedAuthority.from(new SimpleGrantedAuthority("authenticationbroker"))));
     assertThat(DefinedAuthority.PATIENT_SOURCE, equalTo(DefinedAuthority.from(new SimpleGrantedAuthority("patientsource"))));
-    assertThat(DefinedAuthority.SYSTEM, equalTo(DefinedAuthority.from(new SimpleGrantedAuthority("system"))));
   }
 
   @Test
@@ -67,7 +64,6 @@ public class DefinedAuthorityTest
     assertThat(DefinedAuthority.USER_ADMIN, equalTo(DefinedAuthority.from(DefinedAuthority.USER_ADMIN)));
     assertThat(DefinedAuthority.AUTHENTICATION_BROKER, equalTo(DefinedAuthority.from(DefinedAuthority.AUTHENTICATION_BROKER)));
     assertThat(DefinedAuthority.PATIENT_SOURCE, equalTo(DefinedAuthority.from(DefinedAuthority.PATIENT_SOURCE)));
-    assertThat(DefinedAuthority.SYSTEM, equalTo(DefinedAuthority.from(DefinedAuthority.SYSTEM)));
   }
 
   @Test
@@ -85,7 +81,7 @@ public class DefinedAuthorityTest
             DefinedAuthority.USER_ADMIN,
             DefinedAuthority.PATIENT_SOURCE
         ),
-        equalTo(    
+        equalTo(
             DefinedAuthority.from(
                 Arrays.asList(
                     new SimpleGrantedAuthority("provider"),
@@ -125,7 +121,6 @@ public class DefinedAuthorityTest
 
     assertThat(DefinedAuthority.AUTHENTICATION_BROKER.isAssignableByUserAdmin(), is(false));
     assertThat(DefinedAuthority.PATIENT_SOURCE.isAssignableByUserAdmin(), is(false));
-    assertThat(DefinedAuthority.SYSTEM.isAssignableByUserAdmin(), is(false));
   }
 
   @Test

@@ -49,8 +49,9 @@ public class DefinedAuthorityAnnotationSecurityMetadataSource extends
   public Collection<ConfigAttribute> getAttributes(final Method method, final Class<?> targetClass)
   {
     return Lists.newArrayList(Iterables.concat(
-        super.getAttributes(method, targetClass),
-        getExtraAttributes(method, targetClass)));
+        getExtraAttributes(method, targetClass),
+        super.getAttributes(method, targetClass)
+    ));
   }
 
   private Collection<ConfigAttribute> getExtraAttributes(final Method method, final Class<?> targetClass)
