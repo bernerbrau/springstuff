@@ -15,6 +15,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.hateoas.Resources;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -26,25 +28,19 @@ import org.vumc.users.UserDetailsManagerExt;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UserResourceControllerTest
 {
-  public static final String URL_ROOT = "http://servername";
-  public static final String CONTEXT_PATH = "/context";
-  public static final String PATH_WITHIN_APP = "/arbitrary";
-  private UserResourceController controller;
+  private static final String URL_ROOT        = "http://servername";
+  private static final String CONTEXT_PATH    = "/context";
+  private static final String PATH_WITHIN_APP = "/arbitrary";
 
-  private UserResourceAssembler assembler;
-  private UserController        delegate;
-  private UserDetailsManagerExt manager;
-  private PasswordEncoder       encoder;
-
-  private HttpServletRequest request;
-  private ServletRequestAttributes requestAttributes;
+  private UserResourceController resourceController;
+  private UserDetailsManagerExt  manager;
+  private PasswordEncoder        encoder;
 
   @Before
   public void setUp() {
@@ -65,12 +61,12 @@ public class UserResourceControllerTest
       }
     };
 
-    delegate = new UserController(manager, encoder);
+    final UserController delegate = new UserController(manager, encoder);
 
-    assembler = new UserResourceAssembler();
-    controller = new UserResourceController(delegate, assembler);
+    final UserResourceAssembler assembler = new UserResourceAssembler();
+    resourceController = new UserResourceController(delegate, assembler);
 
-    request = mock(HttpServletRequest.class);
+    final HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRequestURL())
         .thenReturn(new StringBuffer(URL_ROOT + CONTEXT_PATH + PATH_WITHIN_APP));
     when(request.getRequestURI())
@@ -82,7 +78,7 @@ public class UserResourceControllerTest
     when(request.getHeaderNames())
         .thenReturn(Iterators.asEnumeration(Collections.<String>emptySet().iterator()));
 
-    requestAttributes = new ServletRequestAttributes(request);
+    final ServletRequestAttributes requestAttributes = new ServletRequestAttributes(request);
 
     RequestContextHolder.setRequestAttributes(requestAttributes);
   }
@@ -106,7 +102,7 @@ public class UserResourceControllerTest
     manager.createUser(user1);
     manager.createUser(user2);
 
-    Resources<User> users = controller.getUsers();
+    Resources<User> users = resourceController.getUsers();
 
     assertEquals(URL_ROOT + CONTEXT_PATH + "/api/users", users.getLink("self").getHref());
     assertEquals(2, Iterables.size(users));
@@ -122,120 +118,109 @@ public class UserResourceControllerTest
     );
   }
 
-//
-//  @Test
-//  public void getUserReturnsUserByName() {
-//    User user1 = new User(
-//       "testuser",
-//       encoder.encode("testpass"),
-//       Collections.singletonList(DefinedAuthority.PROVIDER));
-//    User user2 = new User(
-//       "testadmin",
-//       encoder.encode("testpass2"),
-//       Collections.singletonList(DefinedAuthority.USER_ADMIN));
-//
-//    manager.createUser(user1);
-//    manager.createUser(user2);
-//
-//    User controllerUser1 = controller.getUser("testuser");
-//    User controllerUser2 = controller.getUser("testadmin");
-//
-//    assertEquals(user1.getUsername(), controllerUser1.getUsername());
-//    assertNull(controllerUser1.getPassword());
-//    assertEquals(user1.getAuthorities(), controllerUser1.getAuthorities());
-//
-//    assertEquals(user2.getUsername(), controllerUser2.getUsername());
-//    assertNull(controllerUser1.getPassword());
-//    assertEquals(user2.getAuthorities(), controllerUser2.getAuthorities());
-//  }
-//
-//  @Test
-//  public void getUserWithNonexistentUsernameReturnsNull() {
-//    assertNull(controller.getUser("bogus"));
-//  }
-//
-//  @Test
-//  public void createUserCreatesEnabledUserWithEncodedPassword() {
-//    User user =
-//        new User("testuser", "testpass", Collections.singletonList(DefinedAuthority.PROVIDER));
-//    controller.createNewUser(user);
-//
-//    UserDetails mgrUser = manager.loadUserByUsername("testuser");
-//    assertEquals(user.getUsername(), mgrUser.getUsername());
-//    assertTrue(encoder.matches("testpass",mgrUser.getPassword()));
-//    assertEquals(user.getAuthorities(), DefinedAuthority.from(mgrUser.getAuthorities()));
-//    assertTrue(mgrUser.isEnabled());
-//
-//    assertTrue(manager.userExists("testuser"));
-//  }
-//
-//  @Test
-//  public void updateUserUpdatesUserFields() {
-//    User user =
-//        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
-//    manager.createUser(user);
-//
-//    User updated =
-//        new User("testuser", "testpass2", Collections.singletonList(DefinedAuthority.USER_ADMIN));
-//    updated.setEnabled(false);
-//    controller.updateUser("testuser", updated);
-//
-//    UserDetails mgrUser = manager.loadUserByUsername("testuser");
-//    assertEquals(updated.getUsername(), mgrUser.getUsername());
-//    assertTrue(encoder.matches("testpass2",mgrUser.getPassword()));
-//    assertEquals(updated.getAuthorities(), DefinedAuthority.from(mgrUser.getAuthorities()));
-//    assertFalse(mgrUser.isEnabled());
-//  }
-//
-//  @Test
-//  public void updateUserPreservesPasswordIfNull() {
-//    User user =
-//        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
-//    manager.createUser(user);
-//
-//    User updated =
-//        new User("testuser", null, Collections.singletonList(DefinedAuthority.USER_ADMIN));
-//    updated.setEnabled(false);
-//    controller.updateUser("testuser", updated);
-//
-//    UserDetails mgrUser = manager.loadUserByUsername("testuser");
-//    assertTrue(encoder.matches("testpass",mgrUser.getPassword()));
-//  }
-//
-//  @Test(expected=IllegalArgumentException.class)
-//  public void updateUserThrowsExceptionIfUsernameChanged() {
-//    User user =
-//        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
-//    manager.createUser(user);
-//
-//    User updated =
-//        new User("testuser2", null, Collections.singletonList(DefinedAuthority.USER_ADMIN));
-//    updated.setEnabled(false);
-//    controller.updateUser("testuser", updated);
-//  }
-//
-//
-//  @Test(expected=UsernameNotFoundException.class)
-//  public void updateUserThrowsExceptionIfUserDoesNotExist() {
-//    User user =
-//        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
-//    controller.updateUser("testuser", user);
-//  }
-//
-//  @Test
-//  public void deleteUserRemovesUser() {
-//    User user =
-//        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
-//    manager.createUser(user);
-//
-//    controller.deleteUser("testuser");
-//
-//    assertFalse(manager.userExists("testuser"));
-//  }
-//
-//  @Test(expected=UsernameNotFoundException.class)
-//  public void deleteUserThrowsExceptionIfUserDoesNotExist() {
-//    controller.deleteUser("testuser");
-//  }
+  @Test
+  public void getUserReturnsUserWithSelfLink() throws Exception {
+    User user1 = new User(
+       "testuser",
+       encoder.encode("testpass"),
+       Collections.singletonList(DefinedAuthority.PROVIDER));
+    User user2 = new User(
+       "testadmin",
+       encoder.encode("testpass2"),
+       Collections.singletonList(DefinedAuthority.USER_ADMIN));
+
+    manager.createUser(user1);
+    manager.createUser(user2);
+
+    User controllerUser1 = resourceController.getUser("testuser");
+    User controllerUser2 = resourceController.getUser("testadmin");
+
+    assertEquals(URL_ROOT + CONTEXT_PATH + "/api/users/testuser", controllerUser1.getLink("self").getHref());
+    assertEquals(URL_ROOT + CONTEXT_PATH + "/api/users/testadmin", controllerUser2.getLink("self").getHref());
+  }
+
+  @Test
+  public void createUserCreatesEnabledUserWithEncodedPassword() throws Exception {
+    User user =
+        new User("testuser", "testpass", Collections.singletonList(DefinedAuthority.PROVIDER));
+    resourceController.createNewUser(user);
+
+    UserDetails mgrUser = manager.loadUserByUsername("testuser");
+    assertEquals(user.getUsername(), mgrUser.getUsername());
+    assertTrue(encoder.matches("testpass",mgrUser.getPassword()));
+    assertEquals(user.getAuthorities(), DefinedAuthority.from(mgrUser.getAuthorities()));
+    assertTrue(mgrUser.isEnabled());
+
+    assertTrue(manager.userExists("testuser"));
+  }
+
+  @Test
+  public void updateUserUpdatesUserFields() throws Exception {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    User updated =
+        new User("testuser", "testpass2", Collections.singletonList(DefinedAuthority.USER_ADMIN));
+    updated.setEnabled(false);
+    resourceController.updateUser("testuser", updated);
+
+    UserDetails mgrUser = manager.loadUserByUsername("testuser");
+    assertEquals(updated.getUsername(), mgrUser.getUsername());
+    assertTrue(encoder.matches("testpass2",mgrUser.getPassword()));
+    assertEquals(updated.getAuthorities(), DefinedAuthority.from(mgrUser.getAuthorities()));
+    assertFalse(mgrUser.isEnabled());
+  }
+
+  @Test
+  public void updateUserPreservesPasswordIfNull() throws Exception {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    User updated =
+        new User("testuser", null, Collections.singletonList(DefinedAuthority.USER_ADMIN));
+    updated.setEnabled(false);
+    resourceController.updateUser("testuser", updated);
+
+    UserDetails mgrUser = manager.loadUserByUsername("testuser");
+    assertTrue(encoder.matches("testpass",mgrUser.getPassword()));
+  }
+
+  @Test(expected=IllegalArgumentException.class)
+  public void updateUserThrowsExceptionIfUsernameChanged() throws Exception {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    User updated =
+        new User("testuser2", null, Collections.singletonList(DefinedAuthority.USER_ADMIN));
+    updated.setEnabled(false);
+    resourceController.updateUser("testuser", updated);
+  }
+
+
+  @Test(expected=UsernameNotFoundException.class)
+  public void updateUserThrowsExceptionIfUserDoesNotExist() throws Exception {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    resourceController.updateUser("testuser", user);
+  }
+
+  @Test
+  public void deleteUserRemovesUser() throws Exception {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    resourceController.deleteUser("testuser");
+
+    assertFalse(manager.userExists("testuser"));
+  }
+
+  @Test(expected=UsernameNotFoundException.class)
+  public void deleteUserThrowsExceptionIfUserDoesNotExist() throws Exception {
+    resourceController.deleteUser("testuser");
+  }
 
 }

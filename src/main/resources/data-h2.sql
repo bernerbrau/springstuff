@@ -1,3 +1,6 @@
+drop table if exists message_receipt;
+drop table if exists message;
+
 create table message (id char(36) not null, headers clob not null, payload_class char(100) not null, payload clob not null, timestamp timestamp not null default CURRENT_TIMESTAMP, primary key (id));
 create table message_receipt (server_node_identifier varchar(50) not null, message_id char(36) not null, primary key (message_id, server_node_identifier));
 alter table message_receipt add constraint fk_message_receipt_message foreign key (message_id) references message;
