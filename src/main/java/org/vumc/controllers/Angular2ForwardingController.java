@@ -13,10 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class Angular2ForwardingController
 {
-    @RequestMapping( {"", "/",
+    @RequestMapping( {"",
+                      "/",
                       "/login",
                       "/patients",
-                      "/patients/{id:\\d+}" })
+                      "/patients/{id:\\d+}",
+                      "/users",
+                      "/users/{username:\\w+}"})
     public String index() {
       return "forward:/index.html";
     }

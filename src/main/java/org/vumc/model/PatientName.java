@@ -15,7 +15,7 @@ public class PatientName
 {
   @Column(length=30)
   private String family;
-  @Column(length=30)
+  @Column(length=50)
   private String given;
   @Column(length=10)
   private String suffix;

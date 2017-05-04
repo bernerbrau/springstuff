@@ -34,8 +34,8 @@ import static org.mockito.Mockito.when;
 public class UserResourceControllerTest
 {
   public static final String URL_ROOT = "http://servername";
-  public static final String CONTEXT_PATH = "/continuum";
-  public static final String PATH_WITHIN_APP = "";
+  public static final String CONTEXT_PATH = "/context";
+  public static final String PATH_WITHIN_APP = "/arbitrary";
   private UserResourceController controller;
 
   private UserResourceAssembler assembler;
