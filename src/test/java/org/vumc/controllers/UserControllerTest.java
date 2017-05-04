@@ -14,13 +14,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.vumc.model.DefinedAuthority;
 import org.vumc.model.User;
+import org.vumc.users.InMemoryUserDetailsManagerExt;
 import org.vumc.users.UserDetailsManagerExt;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class UserControllerTest
 {
@@ -31,52 +31,7 @@ public class UserControllerTest
 
   @Before
   public void setUp() {
-    Map<String,User> users = new LinkedHashMap<>();
-
-    manager = new UserDetailsManagerExt()
-    {
-      @Override
-      public List<? extends UserDetails> findAllUsers()
-      {
-        return new ArrayList<>(users.values());
-      }
-
-      @Override
-      public void createUser(final UserDetails user)
-      {
-        users.put(user.getUsername(), User.fromUserDetails(user,true));
-      }
-
-      @Override
-      public void updateUser(final UserDetails user)
-      {
-        users.put(user.getUsername(), User.fromUserDetails(user,true));
-      }
-
-      @Override
-      public void deleteUser(final String username)
-      {
-        users.remove(username);
-      }
-
-      @Override
-      public void changePassword(final String oldPassword, final String newPassword)
-      {
-        throw new UnsupportedOperationException("changePassword is not implemented");
-      }
-
-      @Override
-      public boolean userExists(final String username)
-      {
-        return users.containsKey(username);
-      }
-
-      @Override
-      public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException
-      {
-        return users.get(username);
-      }
-    };
+    manager = new InMemoryUserDetailsManagerExt();
 
     encoder = new PasswordEncoder()
     {
@@ -162,11 +117,82 @@ public class UserControllerTest
         new User("testuser", "testpass", Collections.singletonList(DefinedAuthority.PROVIDER));
     controller.createNewUser(user);
 
-    User mgrUser = (User)manager.loadUserByUsername("testuser");
+    UserDetails mgrUser = manager.loadUserByUsername("testuser");
     assertEquals(user.getUsername(), mgrUser.getUsername());
     assertTrue(encoder.matches("testpass",mgrUser.getPassword()));
-    assertEquals(user.getAuthorities(), mgrUser.getAuthorities());
-    assertTrue(user.isEnabled());
+    assertEquals(user.getAuthorities(), DefinedAuthority.from(mgrUser.getAuthorities()));
+    assertTrue(mgrUser.isEnabled());
+
+    assertTrue(manager.userExists("testuser"));
+  }
+
+  @Test
+  public void updateUserUpdatesUserFields() {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    User updated =
+        new User("testuser", "testpass2", Collections.singletonList(DefinedAuthority.USER_ADMIN));
+    updated.setEnabled(false);
+    controller.updateUser("testuser", updated);
+
+    UserDetails mgrUser = manager.loadUserByUsername("testuser");
+    assertEquals(updated.getUsername(), mgrUser.getUsername());
+    assertTrue(encoder.matches("testpass2",mgrUser.getPassword()));
+    assertEquals(updated.getAuthorities(), DefinedAuthority.from(mgrUser.getAuthorities()));
+    assertFalse(mgrUser.isEnabled());
+  }
+
+  @Test
+  public void updateUserPreservesPasswordIfNull() {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    User updated =
+        new User("testuser", null, Collections.singletonList(DefinedAuthority.USER_ADMIN));
+    updated.setEnabled(false);
+    controller.updateUser("testuser", updated);
+
+    UserDetails mgrUser = manager.loadUserByUsername("testuser");
+    assertTrue(encoder.matches("testpass",mgrUser.getPassword()));
+  }
+
+  @Test(expected=IllegalArgumentException.class)
+  public void updateUserThrowsExceptionIfUsernameChanged() {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    User updated =
+        new User("testuser2", null, Collections.singletonList(DefinedAuthority.USER_ADMIN));
+    updated.setEnabled(false);
+    controller.updateUser("testuser", updated);
+  }
+
+
+  @Test(expected=UsernameNotFoundException.class)
+  public void updateUserThrowsExceptionIfUserDoesNotExist() {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    controller.updateUser("testuser", user);
+  }
+
+  @Test
+  public void deleteUserRemovesUser() {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    controller.deleteUser("testuser");
+
+    assertFalse(manager.userExists("testuser"));
+  }
+
+  @Test(expected=UsernameNotFoundException.class)
+  public void deleteUserThrowsExceptionIfUserDoesNotExist() {
+    controller.deleteUser("testuser");
   }
 
 }

@@ -1,6 +1,7 @@
 package org.vumc.controllers;
 
 
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.vumc.security.annotations.AllowedAuthorities;
 import org.vumc.users.UserDetailsManagerExt;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
@@ -47,8 +49,12 @@ public class UserController {
     @PostAuthorize("returnObject.isConfigurableByUserAdmin()")
     public User getUser(String username) {
         LOGGER.info("Getting user {}", username);
-        UserDetails userDetails = userDetailsManager.loadUserByUsername(username);
-        return userDetails == null ? null : User.fromUserDetails(userDetails, false);
+        if (userDetailsManager.userExists(username)) {
+            UserDetails userDetails = userDetailsManager.loadUserByUsername(username);
+            return User.fromUserDetails(userDetails, false);
+        } else {
+            return null;
+        }
     }
 
     public void createNewUser(User userDetails) {
@@ -60,16 +66,16 @@ public class UserController {
     @PreAuthorize("@userController.isConfigurableByUserAdmin(#username)")
     public void updateUser(String username, User user) {
         LOGGER.info("Updating User {}", user.getUsername());
-
         UserDetails currentUser = userDetailsManager.loadUserByUsername(username);
-        if (currentUser == null) {
-            throw new UsernameNotFoundException(username);
+
+        if (!Objects.equals(currentUser.getUsername(), user.getUsername())) {
+            throw new IllegalArgumentException("Username cannot be changed.");
         }
 
-        if(user.getPassword() != null && !user.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-        } else {
+        if(Strings.isNullOrEmpty(user.getPassword())) {
             user.setPassword(currentUser.getPassword());
+        } else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
 
         userDetailsManager.updateUser(user);
@@ -78,6 +84,10 @@ public class UserController {
     @PreAuthorize("@userController.isConfigurableByUserAdmin(#username)")
     public void deleteUser(String username) {
         LOGGER.info("Deleting User {}", username);
+
+        if (!userDetailsManager.userExists(username)) {
+            throw new UsernameNotFoundException(username);
+        }
 
         userDetailsManager.deleteUser(username);
     }
