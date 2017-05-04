@@ -7,7 +7,6 @@
  */
 package org.vumc.controllers;
 
-import com.google.common.io.CharStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +15,19 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.GenericMessage;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.vumc.model.DefinedAuthority;
 import org.vumc.model.Patient;
 import org.vumc.repository.PatientRepository;
 import org.vumc.security.annotations.AllowedAuthorities;
 import org.vumc.transformations.c32.PatientC32Converter;
 
+import com.google.common.io.CharStreams;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.Reader;
@@ -57,6 +62,7 @@ public class PatientResourceController
       throws TransformerException, IOException
   {
     LOGGER.info("Received new c32");
+    LOGGER.debug("Message content: {}", inC32Request);
     newPatients.send(
         new GenericMessage<>(
             patientRepository.save(
