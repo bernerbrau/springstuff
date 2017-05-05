@@ -18,7 +18,6 @@ import org.vumc.model.RawMessage;
 import org.vumc.repository.PatientRepository;
 import org.vumc.repository.RawC32Repository;
 import org.vumc.transformations.c32.PatientC32ConverterConfig;
-import org.vumc.transformations.c32.RawC32RecordCreator;
 
 import javax.xml.transform.Transformer;
 import java.io.Reader;
@@ -172,7 +171,7 @@ public class PatientResourceControllerTest
         c32String = CharStreams.toString(c32);
       }
     }
-    assertSame(c32String,payload);
+    assertEquals(c32String,payload);
   }
 
 

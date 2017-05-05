@@ -27,7 +27,7 @@ public interface PatientRepository
   Collection<Patient> findAll();
 
   @RestResource(exported=false)
-  @AllowedAuthorities(DefinedAuthority.PATIENT_SOURCE)
+  @AllowedAuthorities(DefinedAuthority.SYSTEM)
   <S extends Patient> S save(S inPatient);
 
 }

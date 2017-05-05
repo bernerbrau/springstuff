@@ -23,7 +23,7 @@ public enum DefinedAuthority implements GrantedAuthority
   USER_ADMIN("useradmin",true),
 
   AUTHENTICATION_BROKER("authenticationbroker",false),
-  PATIENT_SOURCE("patientsource",false);
+  PATIENT_SOURCE("patientsource",false), SYSTEM("system", false);
 
   public final String authority;
   public final boolean assignableByUserAdmin;

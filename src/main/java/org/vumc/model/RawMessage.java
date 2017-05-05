@@ -1,17 +1,17 @@
 package org.vumc.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import javax.persistence.*;
-import java.sql.Clob;
 import java.time.ZonedDateTime;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-
 @Entity
-@JsonInclude(NON_NULL)
 public class RawMessage {
+
+    public static final char STATUS_RECEIVED  = 'R';
+    public static final char STATUS_PROCESSED = 'P';
+    public static final char STATUS_ERROR     = 'E';
+
+    @Column
+    private int processTries = 0;
 
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE,generator="C32_RECEIVED_SEQ")
@@ -21,10 +21,25 @@ public class RawMessage {
     @Column
     private ZonedDateTime received;
 
-    @Lob
-    @JsonIgnore
-    private Clob rawMessage;
+    @Column
+    private ZonedDateTime accessed;
 
+    @Lob
+    private String rawMessage;
+
+    @Column(length = 1)
+    private char status = STATUS_RECEIVED;
+
+    public static RawMessage create(String inC32Request)
+    {
+        RawMessage rawMessage = new RawMessage();
+        rawMessage.received = ZonedDateTime.now();
+        rawMessage.accessed = rawMessage.received;
+        rawMessage.setRawMessage(inC32Request);
+        rawMessage.processTries = 0;
+        rawMessage.setReceivedStatus();
+        return rawMessage;
+    }
 
     public long getId() {
         return id;
@@ -38,16 +53,46 @@ public class RawMessage {
         return received;
     }
 
-    public void setReceived(ZonedDateTime received) {
-        this.received = received;
+    public ZonedDateTime getAccessed()
+    {
+        return accessed;
     }
 
-    public Clob getRawMessage() {
+    public void updateAccessed()
+    {
+        accessed = ZonedDateTime.now();
+    }
+    public String getRawMessage() {
         return rawMessage;
     }
 
-    public void setRawMessage(Clob rawMessage) {
+    public void setRawMessage(String rawMessage) {
         this.rawMessage = rawMessage;
+    }
+
+    public int getProcessTries()
+    {
+        return processTries;
+    }
+
+    public void incrementProcessTries()
+    {
+        processTries++;
+    }
+
+    public void setReceivedStatus()
+    {
+        status = STATUS_RECEIVED;
+    }
+
+    public void setProcessedStatus()
+    {
+        status = STATUS_PROCESSED;
+    }
+
+    public void setErrorStatus()
+    {
+        status = STATUS_ERROR;
     }
 
 }

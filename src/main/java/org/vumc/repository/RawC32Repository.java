@@ -11,17 +11,12 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.vumc.model.RawMessage;
 
-import java.util.Collection;
+import java.time.ZonedDateTime;
 
 
 @Repository
 public interface RawC32Repository extends CrudRepository<RawMessage, Long>
 {
-
-  RawMessage findOne(Long inId);
-
-  Collection<RawMessage> findAll();
-
-  <S extends RawMessage> S save(S inRawC32Message);
-
+  RawMessage findTop1ByStatusAndProcessTriesLessThanAndAccessedLessThanOrderByProcessTriesAscAccessedDesc
+      (char inStatusError, int inMaxProcessTries, ZonedDateTime inMaxAccessedTime);
 }
