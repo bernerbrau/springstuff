@@ -20,7 +20,6 @@ import org.vumc.repository.RawC32Repository;
 import org.vumc.transformations.c32.PatientC32ConverterConfig;
 
 import javax.xml.transform.Transformer;
-import java.io.Reader;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -117,10 +116,9 @@ public class PatientResourceControllerTest
        new PatientC32ConverterConfig()
            .patientC32Converter(transformer),
        fakeRepository,
-       channel,
-       new RawC32RecordCreator(),
-       fakeC32Repository
-    );
+       fakeC32Repository,
+       channel
+     );
   }
 
   @Test
@@ -162,15 +160,9 @@ public class PatientResourceControllerTest
     assertEquals(1,repoC32BackingMap.size());
     RawMessage dbMsg = repoC32BackingMap.values().iterator().next();
 
-    String c32String = "";
-    if (dbMsg != null)
-    {
-      Reader c32 = dbMsg.getRawMessage().getCharacterStream();
-      if (c32 != null)
-      {
-        c32String = CharStreams.toString(c32);
-      }
-    }
+    assertNotNull(dbMsg);
+
+    String c32String = dbMsg.getRawMessage();
     assertEquals(c32String,payload);
   }
 

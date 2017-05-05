@@ -10,7 +10,6 @@ package org.vumc.config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.ExecutorChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.messaging.MessageChannel;
@@ -48,11 +47,6 @@ public class IntegrationConfig
   @Bean(name="rawC32")
   public MessageChannel rawC32(@Qualifier("messageExecutor") Executor executor) {
     return new ExecutorChannel(executor);
-  }
-
-  @Bean(name="c32Errors")
-  public MessageChannel c32Errors() {
-    return new DirectChannel();
   }
 
 }

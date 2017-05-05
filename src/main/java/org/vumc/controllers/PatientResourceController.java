@@ -92,15 +92,13 @@ public class PatientResourceController
               rawMessage.getRawMessage()
           )
       );
-      rawMessage.updateAccessed();
       rawMessage.setProcessedStatus();
       return patient;
     } catch (Throwable t) {
-      rawMessage.setErrorStatus();
       LOGGER.warn("Error handling raw message with id " + rawMessage.getId(), t);
+      rawMessage.setErrorStatus();
       return null;
     } finally {
-      rawMessage.incrementProcessTries();
       rawC32Repository.save(rawMessage);
     }
   }

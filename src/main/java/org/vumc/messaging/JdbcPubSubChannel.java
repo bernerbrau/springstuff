@@ -25,6 +25,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -136,7 +137,7 @@ public class JdbcPubSubChannel extends PublishSubscribeChannel
   }
 
   @Scheduled(fixedDelay = 5000)
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   protected synchronized void poll()
   {
     Iterable<Message<?>> messages = jdbcTemplate.query(
@@ -170,7 +171,7 @@ public class JdbcPubSubChannel extends PublishSubscribeChannel
   }
 
   @Scheduled(initialDelay = 0, fixedRate = 3_600_000)
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   protected void purgeOldMessages()
   {
     Date cutoff = new Date(1000 * nowSource.get().minusDays(1).toEpochSecond());
