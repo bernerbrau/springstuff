@@ -35,6 +35,7 @@ import com.google.common.io.CharStreams;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.Reader;
+import java.sql.Clob;
 import java.sql.SQLException;
 
 @RestController
@@ -95,9 +96,10 @@ public class PatientResourceController
     Patient patient = patientRepository.findOne(id);
     if (patient != null)
     {
-      Reader body = patient.getBody().getCharacterStream();
-      if (body != null)
+      Clob clob = patient.getBody();
+      if (clob != null)
       {
+        Reader body = clob.getCharacterStream();
         LOGGER.info("Presented patient with id {} to user.", id);
         return ResponseEntity.ok(CharStreams.toString(body));
       }

@@ -36,8 +36,8 @@ pitest {
     threads = 4
     outputFormats = ['HTML']
     timeoutConstInMillis = 30_000
-    verbose = true
     enableDefaultIncrementalAnalysis = true
+    maxMutationsPerClass = 100
 }
 
 jar {

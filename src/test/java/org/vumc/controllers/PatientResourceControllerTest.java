@@ -225,12 +225,32 @@ public class PatientResourceControllerTest
     assertEquals(1, repoBackingMap.size());
     Patient dbPatient = repoBackingMap.values().iterator().next();
 
-    assertNotNull(dbPatient.getBody());
+    String dbBody = dbPatient == null ? null :
+                    dbPatient.getBody() == null ? null :
+                    CharStreams.toString(dbPatient.getBody().getCharacterStream());
 
-    String dbBody = mController.getHtml(dbPatient.getId()).getBody();
+    assertNotNull(dbBody);
+
     String controllerBody = mController.getHtml(dbPatient.getId()).getBody();
 
     assertEquals(dbBody, controllerBody);
   }
 
+  @Test
+  public void patientWithNoBodyReturns404() throws Exception
+  {
+    mController.postC32Document(SIMPLE_DOC);
+
+    assertEquals(1, repoBackingMap.size());
+    Patient dbPatient = repoBackingMap.values().iterator().next();
+    dbPatient.setBody(null);
+
+    assertEquals(404, mController.getHtml(dbPatient.getId()).getStatusCodeValue());
+  }
+
+  @Test
+  public void missingPatientReturns404() throws Exception
+  {
+    assertEquals(404, mController.getHtml(6).getStatusCodeValue());
+  }
 }
