@@ -12,6 +12,7 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath "com.moowork.gradle:gradle-node-plugin:1.1.1"
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11'
     }
 }
 
@@ -21,12 +22,22 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'war'
 apply plugin: "com.moowork.node"
 apply plugin: 'io.spring.dependency-management'
+apply plugin: "info.solidsoft.pitest"
 
 dependencyManagement {
     imports {
         mavenBom 'org.apache.logging.log4j:log4j-bom:2.8.1'
         mavenBom "org.springframework.integration:spring-integration-bom:4.3.6.RELEASE"
     }
+}
+
+pitest {
+    targetClasses = ['org.vumc.*']  //by default "${project.group}.*"
+    threads = 4
+    outputFormats = ['HTML']
+    timeoutConstInMillis = 30_000
+    verbose = true
+    enableDefaultIncrementalAnalysis = true
 }
 
 jar {

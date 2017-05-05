@@ -19,6 +19,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -185,86 +186,128 @@ public class UserControllerSecurityTest
     ));
   }
 
+  @Test
+  public void createUserAsUserAdminCreatesUser() {
+    User user =
+        new User("testuser", "testpass", Collections.singletonList(DefinedAuthority.PROVIDER));
 
-//
-//  @Test
-//  public void createUserCreatesEnabledUserWithEncodedPassword() {
-//    User user =
-//        new User("testuser", "testpass", Collections.singletonList(DefinedAuthority.PROVIDER));
-//    controller.createNewUser(user);
-//
-//    UserDetails mgrUser = manager.loadUserByUsername("testuser");
-//    assertEquals(user.getUsername(), mgrUser.getUsername());
-//    assertTrue(encoder.matches("testpass",mgrUser.getPassword()));
-//    assertEquals(user.getAuthorities(), DefinedAuthority.from(mgrUser.getAuthorities()));
-//    assertTrue(mgrUser.isEnabled());
-//
-//    assertTrue(manager.userExists("testuser"));
-//  }
-//
-//  @Test
-//  public void updateUserUpdatesUserFields() {
-//    User user =
-//        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
-//    manager.createUser(user);
-//
-//    User updated =
-//        new User("testuser", "testpass2", Collections.singletonList(DefinedAuthority.USER_ADMIN));
-//    updated.setEnabled(false);
-//    controller.updateUser("testuser", updated);
-//
-//    UserDetails mgrUser = manager.loadUserByUsername("testuser");
-//    assertEquals(updated.getUsername(), mgrUser.getUsername());
-//    assertTrue(encoder.matches("testpass2",mgrUser.getPassword()));
-//    assertEquals(updated.getAuthorities(), DefinedAuthority.from(mgrUser.getAuthorities()));
-//    assertFalse(mgrUser.isEnabled());
-//  }
-//
-//  @Test
-//  public void updateUserPreservesPasswordIfNull() {
-//    User user =
-//        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
-//    manager.createUser(user);
-//
-//    User updated =
-//        new User("testuser", null, Collections.singletonList(DefinedAuthority.USER_ADMIN));
-//    updated.setEnabled(false);
-//    controller.updateUser("testuser", updated);
-//
-//    UserDetails mgrUser = manager.loadUserByUsername("testuser");
-//    assertTrue(encoder.matches("testpass",mgrUser.getPassword()));
-//  }
-//
-//  @Test(expected=IllegalArgumentException.class)
-//  public void updateUserThrowsExceptionIfUsernameChanged() {
-//    User user =
-//        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
-//    manager.createUser(user);
-//
-//    User updated =
-//        new User("testuser2", null, Collections.singletonList(DefinedAuthority.USER_ADMIN));
-//    updated.setEnabled(false);
-//    controller.updateUser("testuser", updated);
-//  }
-//
-//
-//  @Test(expected=UsernameNotFoundException.class)
-//  public void updateUserThrowsExceptionIfUserDoesNotExist() {
-//    User user =
-//        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
-//    controller.updateUser("testuser", user);
-//  }
-//
-//  @Test
-//  public void deleteUserRemovesUser() {
-//    User user =
-//        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
-//    manager.createUser(user);
-//
-//    controller.deleteUser("testuser");
-//
-//    assertFalse(manager.userExists("testuser"));
-//  }
+    withAuthority(DefinedAuthority.USER_ADMIN, () -> controller.createNewUser(user));
+
+    assertTrue(manager.userExists("testuser"));
+  }
+
+  @Test(expected=AccessDeniedException.class)
+  public void createUserAsAnonymousThrowsError() {
+    User user =
+        new User("testuser", "testpass", Collections.singletonList(DefinedAuthority.PROVIDER));
+
+    try {
+      controller.createNewUser(user);
+    } finally {
+      assertFalse(manager.userExists("testuser"));
+    }
+  }
+
+  @Test(expected=AccessDeniedException.class)
+  public void createUserAsOtherAuthorityThrowsError() {
+    User user =
+        new User("testuser", "testpass", Collections.singletonList(DefinedAuthority.PROVIDER));
+
+    try {
+      withAuthority(DefinedAuthority.PROVIDER, () -> controller.createNewUser(user));
+    } finally {
+      assertFalse(manager.userExists("testuser"));
+    }
+  }
+
+  @Test
+  public void updateUserAsUserAdminUpdatesUserFields() {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    User updated =
+        new User("testuser", "testpass2", Collections.singletonList(DefinedAuthority.USER_ADMIN));
+    withAuthority(DefinedAuthority.USER_ADMIN, () -> controller.updateUser("testuser", updated));
+
+    UserDetails mgrUser = manager.loadUserByUsername("testuser");
+    assertTrue(encoder.matches("testpass2",mgrUser.getPassword()));
+  }
+
+  @Test(expected=AccessDeniedException.class)
+  public void updateUserAnonymouslyThrowsError() {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    User updated =
+        new User("testuser", "testpass2", Collections.singletonList(DefinedAuthority.USER_ADMIN));
+    try {
+      controller.updateUser("testuser", updated);
+    } finally {
+      UserDetails mgrUser = manager.loadUserByUsername("testuser");
+      assertTrue(encoder.matches("testpass",mgrUser.getPassword()));
+    }
+  }
+
+  @Test(expected=AccessDeniedException.class)
+  public void updateUserAsOtherAuthorityThrowsError() {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    User updated =
+        new User("testuser", "testpass2", Collections.singletonList(DefinedAuthority.USER_ADMIN));
+    try {
+      withAuthority(DefinedAuthority.PROVIDER, () -> controller.updateUser("testuser", updated));
+    } finally {
+      UserDetails mgrUser = manager.loadUserByUsername("testuser");
+      assertTrue(encoder.matches("testpass",mgrUser.getPassword()));
+    }
+  }
+
+  @Test
+  public void deleteUserAsUserAdminRemovesUser() {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    withAuthority(DefinedAuthority.USER_ADMIN, () -> controller.deleteUser("testuser"));
+
+    assertFalse(manager.userExists("testuser"));
+  }
+
+  @Test(expected=AccessDeniedException.class)
+  public void deleteUserAnonymouslyThrowsError() {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    try
+    {
+      controller.deleteUser("testuser");
+    }
+    finally
+    {
+      assertTrue(manager.userExists("testuser"));
+    }
+  }
+
+  @Test(expected=AccessDeniedException.class)
+  public void deleteUserAsOtherAuthorityThrowsError() {
+    User user =
+        new User("testuser", encoder.encode("testpass"), Collections.singletonList(DefinedAuthority.PROVIDER));
+    manager.createUser(user);
+
+    try
+    {
+      withAuthority(DefinedAuthority.PROVIDER, () -> controller.deleteUser("testuser"));
+    }
+    finally
+    {
+      assertTrue(manager.userExists("testuser"));
+    }
+  }
 //
 //  @Test(expected=UsernameNotFoundException.class)
 //  public void deleteUserThrowsExceptionIfUserDoesNotExist() {
