@@ -14,10 +14,14 @@ import org.junit.Test;
 import org.springframework.integration.channel.QueueChannel;
 import org.vumc.config.TestConfig;
 import org.vumc.model.Patient;
+import org.vumc.model.RawMessage;
 import org.vumc.repository.PatientRepository;
+import org.vumc.repository.RawC32Repository;
 import org.vumc.transformations.c32.PatientC32ConverterConfig;
+import org.vumc.transformations.c32.RawC32RecordCreator;
 
 import javax.xml.transform.Transformer;
+import java.io.Reader;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,14 +74,31 @@ public class PatientResourceControllerTest
   private PatientResourceController mController;
   private Map<Long, Patient>        repoBackingMap;
   private QueueChannel              channel;
+  private Map<Long, RawMessage>  repoC32BackingMap;
 
   @Before
   public void setUp() throws Exception
   {
     AtomicLong sequence = new AtomicLong(0);
+    AtomicLong sequenceC32 = new AtomicLong(0);
 
     repoBackingMap = new HashMap<>();
     channel = new QueueChannel();
+
+    repoC32BackingMap = new HashMap<>();
+
+    RawC32Repository fakeC32Repository = mock(RawC32Repository.class);
+    given(fakeC32Repository.save(any(RawMessage.class)))
+            .willAnswer(i ->
+              {
+                RawMessage m = i.getArgument(0);
+                m.setId(sequenceC32.getAndIncrement());
+                repoC32BackingMap.put(m.getId(),m);
+                return m;
+              }
+            );
+    given(fakeC32Repository.findOne(anyLong()))
+            .willAnswer(i-> repoC32BackingMap.get(i.getArgument(0)));
 
     Transformer transformer = new TestConfig().patientC32DocumentTransformer();
 
@@ -97,7 +118,9 @@ public class PatientResourceControllerTest
        new PatientC32ConverterConfig()
            .patientC32Converter(transformer),
        fakeRepository,
-       channel
+       channel,
+       new RawC32RecordCreator(),
+       fakeC32Repository
     );
   }
 
@@ -130,6 +153,28 @@ public class PatientResourceControllerTest
     assertEquals("M", dbPatient.getGender());
     assertEquals(payload, CharStreams.toString(dbPatient.getRawMessage().getCharacterStream()));
   }
+
+  @Test
+  public void testRawC32SavedToRepository() throws Exception{
+    String payload = SIMPLE_DOC;
+
+    mController.postC32Document(payload);
+
+    assertEquals(1,repoC32BackingMap.size());
+    RawMessage dbMsg = repoC32BackingMap.values().iterator().next();
+
+    String c32String = "";
+    if (dbMsg != null)
+    {
+      Reader c32 = dbMsg.getRawMessage().getCharacterStream();
+      if (c32 != null)
+      {
+        c32String = CharStreams.toString(c32);
+      }
+    }
+    assertSame(c32String,payload);
+  }
+
 
   @Test
   public void testUnwrappedXml() throws Exception

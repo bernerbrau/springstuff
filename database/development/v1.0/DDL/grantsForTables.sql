@@ -8,3 +8,5 @@ grant select, insert, update, delete on CONTINUUMADM.MESSAGE_RECEIPT to CONTINUU
 grant select, insert, update, delete on CONTINUUMADM.MESSAGE_RECEIPT to CONTINUUMOASAPP;
 grant select, insert, update, delete on CONTINUUMADM.PATIENT to CONTINUUMAPP;
 grant select, insert, update, delete on CONTINUUMADM.PATIENT to CONTINUUMOASAPP;
+grant select, insert, update, delete on CONTINUUMADM.RAW_MESSAGE to CONTINUUMAPP;
+grant select, insert, update, delete on CONTINUUMADM.RAW_MESSAGE to CONTINUUMOASAPP;

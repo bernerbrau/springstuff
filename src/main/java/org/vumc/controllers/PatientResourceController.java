@@ -23,9 +23,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.vumc.model.DefinedAuthority;
 import org.vumc.model.Patient;
+
 import org.vumc.repository.PatientRepository;
 import org.vumc.security.annotations.AllowedAuthorities;
 import org.vumc.transformations.c32.PatientC32Converter;
+
+import org.vumc.repository.RawC32Repository;
+import org.vumc.transformations.c32.RawC32RecordCreator;
 
 import com.google.common.io.CharStreams;
 import javax.xml.transform.TransformerException;
@@ -42,17 +46,23 @@ public class PatientResourceController
   private final PatientC32Converter patientC32Converter;
   private final PatientRepository patientRepository;
   private final MessageChannel newPatients;
+  private final RawC32RecordCreator rawC32RecordCreator;
+  private final RawC32Repository rawC32Repository;
 
   @Autowired
   public PatientResourceController(
       PatientC32Converter patientC32Converter,
       PatientRepository patientRepository,
       @Qualifier("newPatients")
-      final MessageChannel inNewPatients)
+      final MessageChannel inNewPatients,
+      RawC32RecordCreator inRawC32RecordCreator,
+      RawC32Repository inRawC32Repository)
   {
     this.patientC32Converter = patientC32Converter;
     this.patientRepository = patientRepository;
     this.newPatients = inNewPatients;
+    this.rawC32RecordCreator = inRawC32RecordCreator;
+    this.rawC32Repository = inRawC32Repository;
   }
 
   @AllowedAuthorities(DefinedAuthority.PATIENT_SOURCE)
@@ -63,6 +73,10 @@ public class PatientResourceController
   {
     LOGGER.info("Received new c32");
     LOGGER.debug("Message content: {}", inC32Request);
+
+    //---  stuff inC32Request into table RAW_MESSAGE.
+    rawC32Repository.save(rawC32RecordCreator.createRawC32MessageObject(inC32Request));
+
     newPatients.send(
         new GenericMessage<>(
             patientRepository.save(
