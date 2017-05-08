@@ -4,8 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.vumc.continuum</groupId>
-    <artifactId>webapp</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>spring</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>api</packaging>
 
     <parent>
@@ -26,6 +26,14 @@
     </scm>
 
     <dependencies>
+        <!-- WAR Overlay -->
+        <dependency>
+            <groupId>org.vumc.continuum</groupId>
+            <artifactId>webapp</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
@@ -139,6 +147,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.integration</groupId>
             <artifactId>spring-integration-jdbc</artifactId>
         </dependency>
@@ -146,23 +159,6 @@
         <dependency>
             <groupId>org.springframework.integration</groupId>
             <artifactId>spring-integration-jpa</artifactId>
-        </dependency>
-
-        <!-- HL7-->
-        <dependency>
-            <groupId>ca.uhn.hapi</groupId>
-            <artifactId>hapi-base</artifactId>
-            <version>2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>ca.uhn.hapi</groupId>
-            <artifactId>hapi-structures-v22</artifactId>
-            <version>2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>ca.uhn.hapi</groupId>
-            <artifactId>hapi-structures-v25</artifactId>
-            <version>2.2</version>
         </dependency>
 
         <!-- Convenience libraries-->
@@ -264,7 +260,7 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.194</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.oracle</groupId>
