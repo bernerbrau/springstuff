@@ -361,6 +361,7 @@
                 <artifactId>maven-clover2-plugin</artifactId>
                 <version>3.1.6</version>
                 <configuration>
+                    <jdk>1.8</jdk>
                     <includesTestSourceRoots>false</includesTestSourceRoots>
                     <generateHtml>true</generateHtml>
                     <generateXml>true</generateXml>
