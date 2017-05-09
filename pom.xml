@@ -331,8 +331,7 @@
                     <outputFormats>
                         <param>HTML</param>
                     </outputFormats>
-                    <timeoutConstIn>30000</timeoutConstIn>
-                    <enableDefaultIncrementalAnalysis>true</enableDefaultIncrementalAnalysis>
+                    <timeoutConstant>30000</timeoutConstant>
                     <maxMutationsPerClass>100</maxMutationsPerClass>
                 </configuration>
             </plugin>
