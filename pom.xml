@@ -312,6 +312,14 @@
                     <artifactId>spring-boot-dependencies</artifactId>
                     <version>${spring.boot.verson}</version>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <compilerVersion>1.8</compilerVersion>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
