@@ -8,6 +8,7 @@
 package org.vumc.config;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
@@ -23,9 +24,18 @@ public class BeanRegistrationConfig implements BeanDefinitionRegistryPostProcess
     // "When in doubt, rip it out."
     // As a last resort for unwanted Spring behavior we can't otherwise change,
     //   exclude the Spring Beans that provide this behavior
-    registry.removeBeanDefinition("errorPageFilter");
-    registry.removeBeanDefinition("profileController");
-    registry.removeBeanDefinition("profileResourceProcessor");
+    try
+    {
+      registry.removeBeanDefinition("errorPageFilter");
+    } catch (NoSuchBeanDefinitionException ex) {}
+    try
+    {
+      registry.removeBeanDefinition("profileController");
+    } catch (NoSuchBeanDefinitionException ex) {}
+    try
+    {
+      registry.removeBeanDefinition("profileResourceProcessor");
+    } catch (NoSuchBeanDefinitionException ex) {}
   }
 
   @Override

@@ -11,12 +11,23 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
+import org.springframework.integration.config.EnableIntegration;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.vumc.config.TestConfig;
 import org.vumc.model.Patient;
 import org.vumc.model.RawMessage;
 import org.vumc.repository.PatientRepository;
 import org.vumc.repository.RawC32Repository;
+import org.vumc.transformations.c32.PatientC32Converter;
 import org.vumc.transformations.c32.PatientC32ConverterConfig;
 
 import javax.xml.transform.Transformer;
@@ -30,7 +41,10 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
+@RunWith(SpringRunner.class)
+@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class PatientResourceControllerTest
 {
   private static final String SIMPLE_WRAPPER =
@@ -69,56 +83,93 @@ public class PatientResourceControllerTest
       "    </recordTarget>\n" +
       "</ClinicalDocument>\n";
 
+  @Autowired
   private PatientResourceController mController;
-  private Map<Long, Patient>        repoBackingMap;
+  @Autowired
+  @Qualifier("newPatients")
   private QueueChannel              channel;
+
+  @Autowired
+  @Qualifier("repoBackingMap")
+  private Map<Long, Patient>        repoBackingMap;
+  @Autowired
+  @Qualifier("repoC32BackingMap")
   private Map<Long, RawMessage>  repoC32BackingMap;
 
-  @Before
-  public void setUp() throws Exception
-  {
-    AtomicLong sequence = new AtomicLong(0);
-    AtomicLong sequenceC32 = new AtomicLong(0);
+  @Configuration
+  public static class PatientConverterConfig extends PatientC32ConverterConfig {}
 
-    repoBackingMap = new HashMap<>();
-    channel = new QueueChannel();
+  @Configuration
+  @EnableIntegration
+  public static class TestConfig extends org.vumc.config.TestConfig {
+    @Bean
+    public DirectChannel rawC32() {
+      return new DirectChannel();
+    }
 
-    repoC32BackingMap = new HashMap<>();
+    @Bean
+    public QueueChannel newPatients() {
+      return new QueueChannel();
+    }
 
-    RawC32Repository fakeC32Repository = mock(RawC32Repository.class);
-    given(fakeC32Repository.save(any(RawMessage.class)))
-            .willAnswer(i ->
+    @Bean
+    public Map<Long, Patient> repoBackingMap() {
+      return new HashMap<>();
+    }
+
+    @Bean
+    public Map<Long, RawMessage> repoC32BackingMap() {
+      return new HashMap<>();
+    }
+
+    @Bean
+    public PatientResourceController patientResourceController(
+        final PatientC32Converter converter,
+        final @Qualifier("rawC32") MessageChannel channel,
+        final @Qualifier("repoBackingMap") Map<Long, Patient> repoBackingMap,
+        final @Qualifier("repoC32BackingMap") Map<Long, RawMessage> repoC32BackingMap) {
+      AtomicLong sequence = new AtomicLong(0);
+      AtomicLong sequenceC32 = new AtomicLong(0);
+
+      RawC32Repository fakeC32Repository = mock(RawC32Repository.class);
+      given(fakeC32Repository.save(any(RawMessage.class)))
+          .willAnswer(i ->
               {
                 RawMessage m = i.getArgument(0);
-                m.setId(sequenceC32.getAndIncrement());
+                if (!repoC32BackingMap.containsKey(m.getId()))
+                {
+                  m.setId(sequenceC32.getAndIncrement());
+                }
                 repoC32BackingMap.put(m.getId(),m);
                 return m;
               }
-            );
-    given(fakeC32Repository.findOne(anyLong()))
-            .willAnswer(i-> repoC32BackingMap.get(i.getArgument(0)));
+          );
+      given(fakeC32Repository.findOne(anyLong()))
+          .willAnswer(i-> repoC32BackingMap.get(i.getArgument(0)));
 
-    Transformer transformer = new TestConfig().patientC32DocumentTransformer();
+      PatientRepository fakeRepository = mock(PatientRepository.class);
+      given(fakeRepository.save(any(Patient.class)))
+          .willAnswer(i ->
+          {
+            Patient p = i.getArgument(0);
+            if (!repoBackingMap.containsKey(p.getId()))
+            {
+              p.setId(sequence.getAndIncrement());
+            }
+            repoBackingMap.put(p.getId(), p);
+            return p;
+          });
+      given(fakeRepository.findOne(anyLong()))
+          .willAnswer(i -> repoBackingMap.get(i.getArgument(0)));
 
-    PatientRepository fakeRepository = mock(PatientRepository.class);
-    given(fakeRepository.save(any(Patient.class)))
-        .willAnswer(i ->
-        {
-          Patient p = i.getArgument(0);
-          p.setId(sequence.getAndIncrement());
-          repoBackingMap.put(p.getId(), p);
-          return p;
-        });
-    given(fakeRepository.findOne(anyLong()))
-        .willAnswer(i -> repoBackingMap.get(i.getArgument(0)));
+      return new PatientResourceController(
+         converter,
+         fakeRepository,
+         fakeC32Repository,
+         channel
+      );
 
-    mController = new PatientResourceController(
-       new PatientC32ConverterConfig()
-           .patientC32Converter(transformer),
-       fakeRepository,
-       fakeC32Repository,
-       channel
-     );
+    }
   }
 
   @Test

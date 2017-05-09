@@ -7,6 +7,8 @@
  */
 package org.vumc.config;
 
+import org.springframework.context.annotation.Bean;
+
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
@@ -16,6 +18,7 @@ import java.io.IOException;
 
 public class TestConfig
 {
+  @Bean
   public Transformer patientC32DocumentTransformer()
       throws IOException, TransformerConfigurationException
   {
