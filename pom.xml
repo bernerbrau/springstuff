@@ -348,30 +348,30 @@
                 <!--<artifactId>maven-release-plugin</artifactId>-->
                 <!--<version>2.5.1</version>-->
             <!--</plugin>-->
-            <!--<plugin>-->
-                <!--<groupId>com.atlassian.maven.plugins</groupId>-->
-                <!--<artifactId>maven-clover2-plugin</artifactId>-->
-                <!--<version>3.1.6</version>-->
-                <!--<configuration>-->
-                    <!--<includesTestSourceRoots>false</includesTestSourceRoots>-->
-                    <!--<generateHtml>true</generateHtml>-->
-                    <!--<generateXml>true</generateXml>-->
-                    <!--<excludes>-->
-                        <!--<exclude>**/IntegrationTest.java</exclude>-->
-                    <!--</excludes>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-            <!--<plugin>-->
-                <!--<groupId>org.codehaus.mojo</groupId>-->
-                <!--<artifactId>cobertura-maven-plugin</artifactId>-->
-                <!--<version>2.7</version>-->
-                <!--<configuration>-->
-                    <!--<formats>-->
-                        <!--<format>html</format>-->
-                        <!--<format>xml</format>-->
-                    <!--</formats>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>maven-clover2-plugin</artifactId>
+                <version>3.1.6</version>
+                <configuration>
+                    <includesTestSourceRoots>false</includesTestSourceRoots>
+                    <generateHtml>true</generateHtml>
+                    <generateXml>true</generateXml>
+                    <excludes>
+                        <exclude>**/IntegrationTest.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <formats>
+                        <format>html</format>
+                        <format>xml</format>
+                    </formats>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
