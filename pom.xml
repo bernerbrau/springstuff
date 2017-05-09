@@ -304,6 +304,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>continuum</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
