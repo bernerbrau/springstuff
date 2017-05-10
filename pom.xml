@@ -5,14 +5,14 @@
 
     <groupId>org.vumc.continuum</groupId>
     <artifactId>spring</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.5.3.RELEASE</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <properties>
@@ -27,15 +27,33 @@
         <developerConnection>scm:svn:https://vcs.mc.vanderbilt.edu/health-it/continuum/spring/trunk</developerConnection>
     </scm>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <!-- WAR Overlay -->
+            <dependencies>
+                <dependency>
+                    <groupId>org.vumc.continuum</groupId>
+                    <artifactId>webapp</artifactId>
+                    <version>1.0.0</version>
+                    <type>war</type>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>release</id>
+            <!-- WAR Overlay -->
+            <dependencies>
+                <dependency>
+                    <groupId>org.vumc.continuum</groupId>
+                    <artifactId>webapp</artifactId>
+                    <version>${project.version}</version>
+                    <type>war</type>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
     <dependencies>
-        <!-- WAR Overlay -->
-        <dependency>
-            <groupId>org.vumc.continuum</groupId>
-            <artifactId>webapp</artifactId>
-            <version>${project.version}</version>
-            <type>war</type>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
@@ -312,14 +330,6 @@
                     <artifactId>spring-boot-dependencies</artifactId>
                     <version>${spring.boot.verson}</version>
                 </plugin>
-                <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <compilerVersion>1.8</compilerVersion>
-                        <source>1.8</source>
-                        <target>1.8</target>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -344,43 +354,30 @@
                 </configuration>
             </plugin>
             <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-compiler-plugin</artifactId>-->
-                <!--<configuration>-->
-                    <!--<source>1.8</source>-->
-                    <!--<target>1.8</target>-->
-                <!--</configuration>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-compiler-plugin</artifactId>-->
+            <!--<configuration>-->
+            <!--<source>1.8</source>-->
+            <!--<target>1.8</target>-->
+            <!--</configuration>-->
             <!--</plugin>-->
             <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-release-plugin</artifactId>-->
-                <!--<version>2.5.1</version>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-release-plugin</artifactId>-->
+            <!--<version>2.5.1</version>-->
             <!--</plugin>-->
-            <plugin>
-                <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-clover2-plugin</artifactId>
-                <version>3.1.6</version>
-                <configuration>
-                    <jdk>1.8</jdk>
-                    <includesTestSourceRoots>false</includesTestSourceRoots>
-                    <generateHtml>true</generateHtml>
-                    <generateXml>true</generateXml>
-                    <excludes>
-                        <exclude>**/IntegrationTest.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <formats>
-                        <format>html</format>
-                        <format>xml</format>
-                    </formats>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>vandy-releases-pro</id>
+            <url>https://nexus.mc.vanderbilt.edu/nexus/content/repositories/releases</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>vandy-snapshots-pro</id>
+            <uniqueVersion>false</uniqueVersion>
+            <url>https://nexus.mc.vanderbilt.edu/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
