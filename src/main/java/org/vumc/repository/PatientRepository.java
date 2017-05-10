@@ -8,12 +8,16 @@
 package org.vumc.repository;
 
 import org.springframework.data.repository.RepositoryDefinition;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.vumc.model.DefinedAuthority;
 import org.vumc.model.Patient;
 import org.vumc.security.annotations.AllowedAuthorities;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
 
 @RepositoryRestResource
@@ -25,6 +29,9 @@ public interface PatientRepository
 
   @AllowedAuthorities(DefinedAuthority.PROVIDER)
   Collection<Patient> findAll();
+
+  @AllowedAuthorities(DefinedAuthority.PROVIDER)
+  Collection<Patient> findByCreatedAfter(@Param("created") @DateTimeFormat(iso = ISO.DATE_TIME) ZonedDateTime created);
 
   @RestResource(exported=false)
   @AllowedAuthorities(DefinedAuthority.SYSTEM)
