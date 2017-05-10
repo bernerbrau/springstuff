@@ -7,10 +7,11 @@
  */
 package org.vumc.transformations.c32;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.InboundChannelAdapter;
 import org.springframework.integration.annotation.Poller;
-import org.springframework.stereotype.Component;
+import org.springframework.integration.core.MessageSource;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.vumc.model.RawMessage;
@@ -18,21 +19,17 @@ import org.vumc.repository.RawC32Repository;
 
 import java.time.ZonedDateTime;
 
-@Component
-public class PatientC32ErrorPoller
+public class PatientC32ErrorPoller implements MessageSource<RawMessage>
 {
   private final RawC32Repository repository;
 
-  @Autowired
   public PatientC32ErrorPoller(final RawC32Repository inRepository)
   {
     repository = inRepository;
   }
 
   @Transactional(isolation = Isolation.READ_COMMITTED)
-  @InboundChannelAdapter(channel = "rawC32",
-      poller=@Poller(fixedDelay="60000", maxMessagesPerPoll="-1"))
-  public RawMessage pollRawMessageInErrorStatus()
+  public Message<RawMessage> receive()
   {
     RawMessage message =
         repository
@@ -48,7 +45,7 @@ public class PatientC32ErrorPoller
     else {
       message.incrementProcessTries();
       message.updateAccessed();
-      return repository.save(message);
+      return new GenericMessage<>(repository.save(message));
     }
   }
 

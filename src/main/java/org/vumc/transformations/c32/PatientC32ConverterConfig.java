@@ -10,6 +10,9 @@ package org.vumc.transformations.c32;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.annotation.InboundChannelAdapter;
+import org.springframework.integration.annotation.Poller;
+import org.vumc.repository.RawC32Repository;
 import org.vumc.transformations.xml.XPathSource;
 
 import javax.xml.transform.Transformer;
@@ -31,4 +34,13 @@ public class PatientC32ConverterConfig
        )
     );
   }
+
+  @Bean
+  @InboundChannelAdapter(channel = "rawC32",
+                         poller=@Poller(fixedDelay="60000", maxMessagesPerPoll="-1"))
+  public PatientC32ErrorPoller patientC32ErrorPoller(final RawC32Repository inRepository)
+  {
+    return new PatientC32ErrorPoller(inRepository);
+  }
+
 }

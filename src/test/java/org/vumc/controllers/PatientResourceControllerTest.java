@@ -9,20 +9,19 @@ package org.vumc.controllers;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.vumc.config.TestConfig;
 import org.vumc.model.Patient;
 import org.vumc.model.RawMessage;
 import org.vumc.repository.PatientRepository;
@@ -97,11 +96,9 @@ public class PatientResourceControllerTest
   private Map<Long, RawMessage>  repoC32BackingMap;
 
   @Configuration
-  public static class PatientConverterConfig extends PatientC32ConverterConfig {}
-
-  @Configuration
   @EnableIntegration
-  public static class TestConfig extends org.vumc.config.TestConfig {
+  @Import(org.vumc.config.TestConfig.class)
+  public static class TestConfig {
     @Bean
     public DirectChannel rawC32() {
       return new DirectChannel();
@@ -124,10 +121,13 @@ public class PatientResourceControllerTest
 
     @Bean
     public PatientResourceController patientResourceController(
-        final PatientC32Converter converter,
+        final @Qualifier("patientC32DocumentTransformer")
+            Transformer patientC32DocumentTransformer,
         final @Qualifier("rawC32") MessageChannel channel,
         final @Qualifier("repoBackingMap") Map<Long, Patient> repoBackingMap,
-        final @Qualifier("repoC32BackingMap") Map<Long, RawMessage> repoC32BackingMap) {
+        final @Qualifier("repoC32BackingMap") Map<Long, RawMessage> repoC32BackingMap) throws Exception {
+      final PatientC32Converter converter = new PatientC32ConverterConfig().patientC32Converter(patientC32DocumentTransformer);
+
       AtomicLong sequence = new AtomicLong(0);
       AtomicLong sequenceC32 = new AtomicLong(0);
 
