@@ -1,0 +1,49 @@
+<HTML>
+<TITLE>Verification Report</TITLE>
+<BODY>
+<H1>C:\workspace\continuum\database\continuum_iti\v1.0\DDL\CONTINUUM_1_0_F1_DDL.sql</H1>
+<H2> ***** Nothing to Report ***** </H2>
+<HR><H1>C:\workspace\continuum\database\continuum_iti\v1.0\DDL\CONTINUUM_1_0_F2_DDL.sql</H1>
+<H2> <font color=red>***** Needs Schema Prefix Added ***** </font> </H2>
+<BR><b><font color=orange>create</font></b> <b><font color=red>sequence</font></b> c32_received_seq
+minvalue 1maxvalue 9999999999999999999999999999start with 1increment by 1cache 20
+<BR><BR>
+
+<BR><b><font color=orange>create</font></b> <b><font color=red>sequence</font></b> patient_seq
+minvalue 1maxvalue 9999999999999999999999999999start with 1increment by 1cache 20
+<BR><BR>
+
+<HR><H1>C:\workspace\continuum\database\continuum_iti\v1.0\DDL\CONTINUUM_1_0_F3_DDL.sql</H1>
+<H2> ***** Nothing to Report ***** </H2>
+<HR><H1>C:\workspace\continuum\database\continuum_iti\v1.0\DML\CONTINUUM_1_0_F5_DML.sql</H1>
+<H2> ***** Nothing to Report ***** </H2>
+<HR><H1>C:\workspace\continuum\database\continuum_iti\v1.0\DDL\CONTINUUM_1_0_F1_ROLLBACK_DDL.sql</H1>
+<H2> ***** Reporting the following for Awareness ***** </H2>
+<BR><b><font color=red>drop</font></b> <b><font color=red>table </font></b>"continuumadm"."authorities"
+<BR><BR>
+
+<BR><b><font color=red>drop</font></b> <b><font color=red>table </font></b>"continuumadm"."users"
+<BR><BR>
+
+<BR><b><font color=red>drop</font></b> <b><font color=red>table </font></b>"continuumadm"."message"
+<BR><BR>
+
+<BR><b><font color=red>drop</font></b> <b><font color=red>table </font></b>"continuumadm"."message_receipt"
+<BR><BR>
+
+<BR><b><font color=red>drop</font></b> <b><font color=red>table </font></b>"continuumadm"."patient"
+<BR><BR>
+
+<BR><b><font color=red>drop</font></b> <b><font color=red>table </font></b>"continuumadm".raw_message
+<BR><BR>
+
+<HR><H1>C:\workspace\continuum\database\continuum_iti\v1.0\DDL\CONTINUUM_1_0_F2_ROLLBACK_DDL.sql</H1>
+<H2> ***** Reporting the following for Awareness ***** </H2>
+<BR><b><font color=red>drop</font></b> <b><font color=red>sequence</font></b> "continuumadm".c32_received_seq
+<BR><BR>
+
+<BR><b><font color=red>drop</font></b> <b><font color=red>sequence</font></b> "continuumadm".patient_seq
+<BR><BR>
+
+<HR></BODY>
+</HTML>

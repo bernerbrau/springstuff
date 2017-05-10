@@ -1,0 +1,187 @@
+<HTML>
+<TITLE>Deployment Information</TITLE>
+<BODY>
+<H1>C:\workspace\continuum\database\continuum_iti\v1.0\DDL\CONTINUUM_1_0_F1_DDL.sql</H1>
+<P>
+CREATE TABLE "CONTINUUMADM"."USERS"<BR>
+(<BR>
+  "USERNAME" VARCHAR2(50 BYTE)  NOT NULL ENABLE,<BR>
+  "PASSWORD" VARCHAR2(500 BYTE) NOT NULL ENABLE,<BR>
+  "ENABLED"  NUMBER(1, 0)       NOT NULL ENABLE,<BR>
+  PRIMARY KEY ("USERNAME") ENABLE<BR>
+)<BR>
+/<BR>
+<BR>
+CREATE TABLE "CONTINUUMADM"."AUTHORITIES"<BR>
+(<BR>
+  "USERNAME"  VARCHAR2(50 BYTE) NOT NULL ENABLE,<BR>
+  "AUTHORITY" VARCHAR2(50 BYTE) NOT NULL ENABLE,<BR>
+  CONSTRAINT "FK_AUTHORITIES_USERS" FOREIGN KEY ("USERNAME")<BR>
+  REFERENCES "CONTINUUMADM"."USERS" ("USERNAME") ENABLE<BR>
+)<BR>
+/<BR>
+<BR>
+CREATE UNIQUE INDEX "CONTINUUMADM"."IX_AUTH_USERNAME" ON "CONTINUUMADM"."AUTHORITIES" ("USERNAME", "AUTHORITY");<BR>
+/<BR>
+<BR>
+CREATE TABLE "CONTINUUMADM"."MESSAGE"<BR>
+(<BR>
+  "ID"            CHAR(36 BYTE)      NOT NULL ENABLE,<BR>
+  "HEADERS"       CLOB               NOT NULL ENABLE,<BR>
+  "PAYLOAD_CLASS" VARCHAR2(100 BYTE) NOT NULL ENABLE,<BR>
+  "PAYLOAD"       CLOB               NOT NULL ENABLE,<BR>
+  "TIMESTAMP"     TIMESTAMP(6)       NOT NULL ENABLE,<BR>
+  PRIMARY KEY ("ID")<BR>
+)<BR>
+/<BR>
+<BR>
+CREATE TABLE "CONTINUUMADM"."MESSAGE_RECEIPT"<BR>
+(<BR>
+  "SERVER_NODE_IDENTIFIER" VARCHAR2(50 BYTE) NOT NULL ENABLE,<BR>
+  "MESSAGE_ID"             CHAR(36 BYTE)     NOT NULL ENABLE,<BR>
+  PRIMARY KEY ("MESSAGE_ID", "SERVER_NODE_IDENTIFIER")<BR>
+)<BR>
+/<BR>
+<BR>
+CREATE TABLE "CONTINUUMADM"."PATIENT"<BR>
+(<BR>
+  "ID"                     NUMBER(19, 0)      NOT NULL ENABLE,<BR>
+  "ID_ASSIGNING_AUTHORITY" VARCHAR2(100 CHAR) NOT NULL ENABLE,<BR>
+  "BODY"                   CLOB,<BR>
+  "DOB"                    DATE,<BR>
+  "GENDER"                 VARCHAR2(30 CHAR),<BR>
+  "FAMILY"                 VARCHAR2(30 CHAR),<BR>
+  "GIVEN"                  VARCHAR2(30 CHAR),<BR>
+  "SUFFIX"                 VARCHAR2(10 CHAR),<BR>
+  "PATIENT_ID"             VARCHAR2(30 CHAR),<BR>
+  "NAME"                   VARCHAR2(100 BYTE),<BR>
+  "CREATED"                TIMESTAMP(6)       NOT NULL ENABLE,<BR>
+  "RAW_MESSAGE"            CLOB,<BR>
+  PRIMARY KEY ("ID") ENABLE<BR>
+)<BR>
+/<BR>
+<BR>
+CREATE TABLE "CONTINUUMADM"."RAW_MESSAGE"<BR>
+(<BR>
+  "ID"                     NUMBER(19, 0)      NOT NULL ENABLE,<BR>
+  "RECEIVED"                TIMESTAMP(6)       NOT NULL ENABLE,<BR>
+  "RAW_MESSAGE"            CLOB,<BR>
+  PRIMARY KEY ("ID") ENABLE<BR>
+)<BR>
+/<BR>
+</P>
+<H1>C:\workspace\continuum\database\continuum_iti\v1.0\DDL\CONTINUUM_1_0_F2_DDL.sql</H1>
+<P>
+create sequence C32_RECEIVED_SEQ<BR>
+minvalue 1<BR>
+maxvalue 9999999999999999999999999999<BR>
+start with 1<BR>
+increment by 1<BR>
+cache 20<BR>
+/<BR>
+<BR>
+create sequence PATIENT_SEQ<BR>
+minvalue 1<BR>
+maxvalue 9999999999999999999999999999<BR>
+start with 1<BR>
+increment by 1<BR>
+cache 20<BR>
+/<BR>
+</P>
+<H1>C:\workspace\continuum\database\continuum_iti\v1.0\DDL\CONTINUUM_1_0_F3_DDL.sql</H1>
+<P>
+grant select on CONTINUUMADM.C32_RECEIVED_SEQ to CONTINUUM_APP_ROLE<BR>
+/<BR>
+<BR>
+grant select on CONTINUUMADM.PATIENT_SEQ to CONTINUUM_APP_ROLE<BR>
+/<BR>
+</P>
+<H1>C:\workspace\continuum\database\continuum_iti\v1.0\DML\CONTINUUM_1_0_F5_DML.sql</H1>
+<P>
+Insert into CONTINUUMADM.USERS (USERNAME,PASSWORD,ENABLED) values ('continuumdev','0',1)<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.USERS (USERNAME,PASSWORD,ENABLED) values ('joshtest','$2a$11$crDwF8yE07nAPfbekXNanOZYIjUNDYsIg8X/WEayt0NSvXJcKIkyS',1)<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.USERS (USERNAME,PASSWORD,ENABLED) values ('vaadevmessaging.orionhealthcloud.com','0',1)<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.USERS (USERNAME,PASSWORD,ENABLED) values ('messaging.vaa.dev.orionhealth-saas-svcs.com','0',1)<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.USERS (USERNAME,PASSWORD,ENABLED) values ('blandr','$2a$11$q2Pao.bxpvv45.5V0TwjyuURcDmVPOjVzu8FNzDhbGkO6m.XLv4YG',1)<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.USERS (USERNAME,PASSWORD,ENABLED) values ('adamspl1','$2a$11$YY5vjkV6ls9kGV0DgNuNlua75QiAj.cCRks5cywdE2M3QB6w0ZwSK',1)<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.USERS (USERNAME,PASSWORD,ENABLED) values ('bernerdc','$2a$04$Tv3XL/Zme.cF3jbeUiX3r.kf3Myb5W6SlyD8UuwthZ5mtki2.kuw.',1)<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.AUTHORITIES (USERNAME,AUTHORITY) values ('continuumdev','authenticationbroker')<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.AUTHORITIES (USERNAME,AUTHORITY) values ('joshtest','provider')<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.AUTHORITIES (USERNAME,AUTHORITY) values ('joshtest','useradmin')<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.AUTHORITIES (USERNAME,AUTHORITY) values ('vaadevmessaging.orionhealthcloud.com','patientsource')<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.AUTHORITIES (USERNAME,AUTHORITY) values ('messaging.vaa.dev.orionhealth-saas-svcs.com','patientsource')<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.AUTHORITIES (USERNAME,AUTHORITY) values ('bernerdc','useradmin')<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.AUTHORITIES (USERNAME,AUTHORITY) values ('blandr','provider')<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.AUTHORITIES (USERNAME,AUTHORITY) values ('blandr','useradmin')<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.AUTHORITIES (USERNAME,AUTHORITY) values ('adamspl1','provider')<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.AUTHORITIES (USERNAME,AUTHORITY) values ('adamspl1','useradmin')<BR>
+/<BR>
+<BR>
+Insert into CONTINUUMADM.AUTHORITIES (USERNAME,AUTHORITY) values ('bernerdc','provider');<BR>
+/<BR>
+<BR>
+COMMIT<BR>
+/<BR>
+</P>
+<H1>C:\workspace\continuum\database\continuum_iti\v1.0\DDL\CONTINUUM_1_0_F1_ROLLBACK_DDL.sql</H1>
+<P>
+DROP TABLE "CONTINUUMADM"."AUTHORITIES"<BR>
+/<BR>
+<BR>
+DROP TABLE "CONTINUUMADM"."USERS"<BR>
+/<BR>
+<BR>
+DROP TABLE "CONTINUUMADM"."MESSAGE"<BR>
+/<BR>
+<BR>
+DROP TABLE "CONTINUUMADM"."MESSAGE_RECEIPT"<BR>
+/<BR>
+<BR>
+DROP TABLE "CONTINUUMADM"."PATIENT"<BR>
+/<BR>
+<BR>
+DROP TABLE "CONTINUUMADM".RAW_MESSAGE<BR>
+/<BR>
+</P>
+<H1>C:\workspace\continuum\database\continuum_iti\v1.0\DDL\CONTINUUM_1_0_F2_ROLLBACK_DDL.sql</H1>
+<P>
+DROP SEQUENCE "CONTINUUMADM".C32_RECEIVED_SEQ<BR>
+/<BR>
+<BR>
+DROP SEQUENCE "CONTINUUMADM".PATIENT_SEQ<BR>
+/<BR>
+</P>
+</BODY>
+</HTML>
