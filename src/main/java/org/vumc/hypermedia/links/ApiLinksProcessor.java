@@ -89,6 +89,7 @@ public class ApiLinksProcessor implements ResourceProcessor<RepositoryLinksResou
                   new TemplateVariable("id", PATH_VARIABLE)
               ).withRel("patientTemplate")
           ));
+      resource.add(repositoryEntityLinks.linksToSearchResources(Patient.class));
     });
 
     ifHasAuthority(DefinedAuthority.USER_ADMIN, () -> {
