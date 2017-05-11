@@ -1,15 +1,12 @@
 package org.vumc;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
@@ -20,16 +17,12 @@ import org.springframework.web.context.WebApplicationContext;
 import org.vumc.weblogic.WeblogicAnnotationConfigEmbeddedWebApplicationContext;
 
 @SpringBootApplication
-@EnableEntityLinks
 @EnableTransactionManagement
 @EnableScheduling
 @EnableAspectJAutoProxy
+@EnableJpaRepositories
+@EnableEntityLinks
 @EnableHypermediaSupport(type = HypermediaType.HAL)
-@ImportAutoConfiguration({
-   HibernateJpaAutoConfiguration.class,
-   JpaRepositoriesAutoConfiguration.class,
-   DataSourceTransactionManagerAutoConfiguration.class
-})
 @PropertySource(value = "classpath:continuum.system.properties", ignoreResourceNotFound = true)
 public class ContinuumApplication
     extends SpringBootServletInitializer
