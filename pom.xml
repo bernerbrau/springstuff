@@ -4,7 +4,7 @@
 
     <groupId>org.vumc.continuum</groupId>
     <artifactId>continuum</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <parent>
@@ -22,8 +22,8 @@
     </properties>
 
     <scm>
-        <connection>scm:svn:https://vcs.mc.vanderbilt.edu/health-it/continuum/spring/tags/continuum-1.0.2</connection>
-        <developerConnection>scm:svn:https://vcs.mc.vanderbilt.edu/health-it/continuum/spring/tags/continuum-1.0.2</developerConnection>
+        <connection>scm:svn:https://vcs.mc.vanderbilt.edu/health-it/continuum/spring/trunk</connection>
+        <developerConnection>scm:svn:https://vcs.mc.vanderbilt.edu/health-it/continuum/spring/trunk</developerConnection>
     </scm>
 
     <profiles>
